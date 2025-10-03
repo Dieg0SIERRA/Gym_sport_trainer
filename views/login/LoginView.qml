@@ -7,6 +7,13 @@ Item {
     id: root
     signal loginSuccess()
     property string currentView: "menu"     // values: "menu", "login", "create"
+    // signal navigateToHomepage()  // Nueva señal
+
+    // Validation properties
+    property bool isUsernameValid: false
+    property bool isPasswordValid: false
+    property bool isConfirmPasswordValid: false
+    property bool showSuccessPopup: false
 
     Image {
         id: backgroundImage
@@ -212,6 +219,46 @@ Item {
         }
     }
 
-    // login field
+    // Validation functions
+    function validateUsername() {
+        var username = usernameField.text
+        // Regex: solo letras, números, punto, guión bajo, guión medio
+        var validFormat = /^[a-zA-Z0-9._-]+$/.test(username)
+        var hasMinLength = username.length >= 5
 
+        isUsernameValid = validFormat && hasMinLength
+    }
+
+    function validatePassword() {
+        var password = passwordField.text
+        var hasUpper = /[A-Z]/.test(password)
+        var hasLower = /[a-z]/.test(password)
+        var hasNumber = /[0-9]/.test(password)
+        var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+        var hasMinLength = password.length >= 8
+
+        isPasswordValid = hasUpper && hasLower && hasNumber && hasSpecial && hasMinLength
+    }
+
+    function validateConfirmPassword() {
+        isConfirmPasswordValid = confirmPasswordField.text === passwordField.text &&
+                               confirmPasswordField.text.length > 0
+    }
+
+    function showSuccessPopup() {
+        showSuccessPopup = true
+    }
+
+    // Función para manejar la creación de cuenta
+    function handleAccountCreation() {
+        console.log("Creating account for:", usernameField.text)
+        // Aquí se conectará con SQLite después
+
+        // Mostrar popup de éxito
+        showSuccessPopup = true
+    }
+
+    function navigateToHomepage() {
+        root.loginSuccess()  // Emite la señal hacia Main.qml
+    }
 }
