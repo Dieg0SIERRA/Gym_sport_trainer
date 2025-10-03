@@ -132,6 +132,83 @@ Item {
                 text: "Create Account"
                 onClicked: handleAccountCreation()
             }
+    // --- Login Account ---
+    Rectangle {
+        id: loginContainer
+        width: 380
+        height: 500
+        radius: 20
+        anchors.centerIn: parent
+        color: Qt.rgba(30/255, 30/255, 30/255, 0.85)
+        visible: root.currentView === "login"
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            width: parent.width - 60
+            spacing: 25
+
+            // Back button
+            Components.GenericButton {
+                Layout.alignment: Qt.AlignLeft
+                width: 80; height: 35; fontSize: 14; buttonRadius: 8
+                text: " Back"
+
+                onClicked: {
+                    root.currentView = "menu"
+                    // Cleaning fields
+                    usernameField.text = ""
+                    passwordField.text = ""
+                    confirmPasswordField.text = ""
+                }
+            }
+
+            // Logo/Title
+            LogoTitle {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: 80
+
+                titleText: "Exercise Tracker"
+                iconText: "💪"
+            }
+
+            // User field
+            Components.GenericTextField {
+                id: userField
+                Layout.fillWidth: true
+                Layout.preferredHeight: 70
+
+                labelFontSize:14
+                labelText: "User"
+                placeholderText: "Enter User"
+            }
+
+            // Password field
+            Components.GenericTextField {
+                id: passField
+                Layout.fillWidth: true
+                Layout.preferredHeight: 70
+
+                labelFontSize:14
+                labelText: "Password"
+                placeholderText: "Enter Password"
+            }
+
+            // Login button
+            Components.GenericButton {
+                id: loginButton
+                Layout.fillWidth: true
+                Layout.preferredHeight: 55
+                Layout.topMargin: 15
+
+                width: 200; height: 50; buttonRadius: 14; fontSize: 18
+                text: "Login"
+                // enabled:
+
+                onClicked: {
+                    if (userField.text.trim() !== "" && passwordField.text.trim() !== "")
+                        loginSuccess()
+                }
+            }
         }
     }
 
