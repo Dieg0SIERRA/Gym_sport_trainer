@@ -23,7 +23,64 @@ Item {
         fillMode: Image.PreserveAspectCrop
     }
 
-    // --- Start screen with 2 buttons ---
+    // Pop-up accout created successfully
+    Rectangle {
+        id: successPopup
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.7)
+        visible: showSuccessPopup
+        z: 1000
+
+        Rectangle {
+            width: 300
+            height: 200
+            anchors.centerIn: parent
+            color: "#2a2a2a"
+            radius: 15
+            border.width: 2
+            border.color: "#6C63FF"
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 20
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "✓"
+                    color: "#40a040"
+                    font.pixelSize: 40
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Account created successfully!"
+                    color: "#ffffff"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                }
+
+                // OK Button
+                Components.GenericButton {
+                    Layout.preferredWidth: 100
+                    Layout.preferredHeight: 40
+                    Layout.alignment: Qt.AlignHCenter
+
+                    width: 200; height: 50; buttonRadius: 8; fontSize: 18;
+                    text: "OK"
+                    onClicked: {
+                        showSuccessPopup = false
+                        // Limpiar campos
+                        usernameField.text = ""
+                        passwordField.text = ""
+                        confirmPasswordField.text = ""
+                        navigateToHomepage()
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Start screen with buttons ---
     Column {
         id: startMenu
         anchors.centerIn: parent
