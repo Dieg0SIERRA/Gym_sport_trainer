@@ -109,8 +109,26 @@ Rectangle {
             height: parent.height
             color: "#ecf0f1"
 
-            // Content of placeholder
-            
+            // content of placeholder
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+
+                Text {
+                    text: "Sección: " + root.currentSection.toUpperCase()
+                    font.pixelSize: 24
+                    font.weight: Font.Bold
+                    color: "#2c3e50"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    text: "Aquí irá el contenido del dashboard"
+                    font.pixelSize: 16
+                    color: "#7f8c8d"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
         }
     }
 }
