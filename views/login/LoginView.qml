@@ -211,6 +211,25 @@ Item {
                 text: "Create Account"
                 onClicked: handleAccountCreation()
             }
+
+            // Help field : Already have an account ?
+            HelpText {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 10
+
+                helpText: "Already have an account? Login"
+
+                onClicked: {
+                    root.currentView = "login"
+                    // Limpiar campos
+                    usernameField.text = ""
+                    passwordField.text = ""
+                    confirmPasswordField.text = ""
+                }
+            }
+        }
+    }
+
     // --- Login Account ---
     Rectangle {
         id: loginContainer
@@ -286,6 +305,18 @@ Item {
                 onClicked: {
                     if (userField.text.trim() !== "" && passwordField.text.trim() !== "")
                         loginSuccess()
+                }
+            }
+
+            // Help field : Forgot your password ?
+            HelpText {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 10
+
+                helpText: "Forgot your password ?"
+
+                onClicked: {
+                    console.log("Recover password")
                 }
             }
         }
