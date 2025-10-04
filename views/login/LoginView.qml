@@ -115,7 +115,22 @@ Item {
             width: parent.width - 60
             spacing: 20
 
-            // Logo & Title
+            // Back button
+            Components.GenericButton {
+                Layout.alignment: Qt.AlignLeft
+                width: 80; height: 35; fontSize: 14; buttonRadius: 8
+                text: "Back"
+
+                onClicked: {
+                    root.currentView = "menu"
+                    // cleaning fiels
+                    usernameField.text = ""
+                    passwordField.text = ""
+                    confirmPasswordField.text = ""
+                }
+            }
+
+            // Logo/Title
             LogoTitle {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: 80
