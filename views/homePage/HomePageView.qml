@@ -104,23 +104,20 @@ Rectangle {
         }
 
         // --- Main area (placeholder) ---
-        Flickable {
+        Rectangle {
 			id: dashboard
 			anchors.fill: parent
-			contentWidth: parent.width
-			contentHeight: columnContent.implicitHeight
-			clip: true
+			color: "#ecf0f1"
 		
-			ColumnLayout {
-				id: columnContent
+			Column {
 				width: parent.width
 				spacing: 20
-				//padding: 20
+				anchors.top: parent.top
+				anchors.horizontalCenter: parent.horizontalCenter
 		
-				// Acciones rápidas (fijos)
-				RowLayout {
-					Layout.fillWidth: true
+				Row {
 					spacing: 10
+					width: parent.width
 		
 					Repeater {
 						model: ListModel {
@@ -133,6 +130,7 @@ Rectangle {
 							width: 150; height: 50
 							radius: 25
 							color: "#1E90FF"
+		
 							Text {
 								text: model.icon + " " + model.label
 								anchors.centerIn: parent
