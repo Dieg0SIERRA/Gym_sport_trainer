@@ -35,6 +35,126 @@ Rectangle {
             opacity = 1
         }
     }
+
+    // ===== definition of each component =====
+
+    Component {
+        id: homeContent
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                text: "HOME"
+                font.pixelSize: 32
+                font.weight: Font.Bold
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                text: "Welcome to dashboard"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
+
+    Component {
+        id: seanceContent
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                text: "SEANCE"
+                font.pixelSize: 32
+                font.weight: Font.Bold
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                text: "Training sessions management"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
+
+    Component {
+        id: exerciseContent
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                text: "EXERCISE"
+                font.pixelSize: 32
+                font.weight: Font.Bold
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                text: "Library of exercises"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
+
+    Component {
+        id: programContent
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                text: "PROGRAMMES"
+                font.pixelSize: 32
+                font.weight: Font.Bold
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                text: "Training programmes"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
+
+    Component {
+        id: statsContent
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+
+            Text {
+                text: "STATS"
+                font.pixelSize: 32
+                font.weight: Font.Bold
+                color: "#2c3e50"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                text: "Statistics & Progress"
+                font.pixelSize: 16
+                color: "#7f8c8d"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+    }
 }
-
-
