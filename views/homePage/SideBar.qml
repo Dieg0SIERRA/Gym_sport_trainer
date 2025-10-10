@@ -3,17 +3,25 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Rectangle {
-    id: sidebar
+    id: root
     color: "#2c3e50"
 
     property string currentSection: "home"
 
-    // signal to notify changes
+    // Signal to notify changes
     signal sectionChanged(string section)
+
+    // separated data model
+    property var menuItems: [
+        { name: "Home", icon: "🏠", section: "home" },
+        { name: "Seance", icon: "🏋️", section: "seance" },
+        { name: "Exercise", icon: "🏃", section: "exercise" },
+        { name: "Program", icon: "📋", section: "program" },
+        { name: "Stats", icon: "📊", section: "stats" }
+    ]
 
     Column {
         anchors.fill: parent
-        anchors.margins: 0
         spacing: 0
 
         // upper spacer
@@ -24,68 +32,18 @@ Rectangle {
 
         // Menu Items
         Repeater {
-            model: [
-                { name: "Home", icon: "🏠", section: "home" },
-                { name: "Seance", icon: "🏋️", section: "seance" },
-                { name: "Exercise", icon: "🏃", section: "exercise" },
-                { name: "Program", icon: "📋", section: "program" },
-                { name: "Stats", icon: "📊", section: "stats" }
-            ]
+            model: root.menuItems
 
-            delegate: Rectangle {
-                width: sidebar.width
+            delegate: SideBarItem {
+                width: root.width
                 height: 60
-                color: sidebar.currentSection === modelData.section ? "#34495e" : "transparent"
+                itemName: modelData.name
+                itemIcon: modelData.icon
+                itemSection: modelData.section
+                isActive: root.currentSection === modelData.section
 
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    onClicked: {
-                        sidebar.sectionChanged(modelData.section)
-                        console.log("Selected section:", modelData.section)
-                    }
-
-                    onEntered: {
-                        parent.color = sidebar.currentSection === modelData.section ? "#34495e" : "#3d566e"
-                    }
-
-                    onExited: {
-                        parent.color = sidebar.currentSection === modelData.section ? "#34495e" : "transparent"
-                    }
-                }
-
-                Row {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 30
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 15
-
-                    // Icono
-                    Text {
-                        text: modelData.icon
-                        font.pixelSize: 18
-                        color: "white"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    // Text
-                    Text {
-                        text: modelData.name
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
-                        color: "white"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                // Section indicator (sidebar)
-                Rectangle {
-                    width: 4
-                    height: parent.height
-                    color: "#3498db"
-                    anchors.right: parent.right
-                    visible: sidebar.currentSection === modelData.section
+                onClicked: {
+                    root.sectionChanged(modelData.section)
                 }
             }
         }
@@ -93,8 +51,7 @@ Rectangle {
         // space to to push-up elements
         Item {
             width: parent.width
-            height: parent.height - 40 - (60 * 5) // altura restante
+            Layout.fillHeight: true
         }
     }
 }
-

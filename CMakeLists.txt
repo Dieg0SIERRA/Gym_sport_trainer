@@ -15,13 +15,14 @@ qt_add_executable(appGymTracker
 qt_add_qml_module(appGymTracker URI GymTracker  VERSION 1.0
     QML_FILES
         Main.qml
-		views/components/GenericButton.qml
+	views/components/GenericButton.qml
         views/components/GenericTextField.qml
         views/homePage/CalendarWidget.qml
         views/homePage/Dashboard.qml
         views/homePage/HomePageView.qml
-        views/homePage/SideBar.qml
-		views/login/LoginView.qml
+        views/homePage/SideBarItem.qml
+	views/homePage/SideBar.qml
+	views/login/LoginView.qml
         views/login/LogoTitle.qml
 )
 
