@@ -98,6 +98,14 @@ Item {
             text: "Create Account"
             onClicked: root.currentView = "create"
         }
+
+        Components.GenericButton {
+            width: 230; height: 70; buttonRadius: 10; fontSize: 22;
+            normalColor: "#d40db9"
+            hoverColor:  "#f2a7e8"
+            text: "Testing dashboard"
+            onClicked: navigateToHomepage()
+        }
     }
 
     // --- Create Account ---
