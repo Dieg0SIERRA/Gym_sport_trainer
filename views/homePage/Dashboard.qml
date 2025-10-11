@@ -9,6 +9,27 @@ Rectangle {
 
     property string currentSection: "home"
 
+    // ===== Constants for graphic design =====
+    readonly property color primaryBlue: "#1E90FF"
+    readonly property color hoverBlue: "#4169E1"
+    readonly property color pressedBlue: "#0066CC"
+    readonly property color darkText: "#2c3e50"
+    readonly property color lightText: "#95a5a6"
+    readonly property color cardBackground: "white"
+    readonly property color cardBorder: "#e0e0e0"
+
+    readonly property int buttonWidth: 250
+    readonly property int buttonHeight: 80
+    readonly property int cardWidth: 250
+    readonly property int cardHeight: 120
+    readonly property int gridSpacing: 20
+    readonly property int buttonRadius: 20
+    readonly property int cardRadius: 20
+    readonly property int buttonFontSize: 18
+    readonly property int cardValueSize: 28
+    readonly property int cardLabelSize: 16
+    readonly property int cardEmojiSize: 32
+
     // Charging content dynamically depending on section
     Loader {
         id: contentLoader
@@ -48,19 +69,19 @@ Rectangle {
             GridLayout {
                 anchors.centerIn: parent
                 columns: 2
-                rowSpacing: 20
-                columnSpacing: 20
+                rowSpacing: root.gridSpacing
+                columnSpacing: root.gridSpacing
 
                 // Botón Add seance
                 Components.GenericButton {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 80
+                    Layout.preferredWidth: root.buttonWidth
+                    Layout.preferredHeight: root.buttonHeight
                     text: "+ Add seance"
-                    fontSize: 18
-                    buttonRadius: 20
-                    normalColor: "#1E90FF"
-                    hoverColor: "#4169E1"
-                    pressedColor: "#0066CC"
+                    fontSize: root.buttonFontSize
+                    buttonRadius: root.buttonRadius
+                    normalColor: root.primaryBlue
+                    hoverColor: root.hoverBlue
+                    pressedColor: root.pressedBlue
 
                     onClicked: {
                         console.log("Add seance clicked")
@@ -69,11 +90,11 @@ Rectangle {
 
                 // Card Calendar
                 Rectangle {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 120
-                    radius: 20
-                    color: "white"
-                    border.color: "#e0e0e0"
+                    Layout.preferredWidth: root.cardWidth
+                    Layout.preferredHeight: root.cardHeight
+                    radius: root.cardRadius
+                    color: root.cardBackground
+                    border.color: root.cardBorder
                     border.width: 1
 
                     Row {
@@ -90,7 +111,7 @@ Rectangle {
                             text: "Calendar"
                             font.pixelSize: 24
                             font.weight: Font.Bold
-                            color: "#2c3e50"
+                            color: root.darkText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -98,14 +119,14 @@ Rectangle {
 
                 // Botón Add exercise
                 Components.GenericButton {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 80
+                    Layout.preferredWidth: root.buttonWidth
+                    Layout.preferredHeight: root.buttonHeight
                     text: "+ Add exercise"
-                    fontSize: 18
-                    buttonRadius: 20
-                    normalColor: "#1E90FF"
-                    hoverColor: "#4169E1"
-                    pressedColor: "#0066CC"
+                    fontSize: root.buttonFontSize
+                    buttonRadius: root.buttonRadius
+                    normalColor: root.primaryBlue
+                    hoverColor: root.hoverBlue
+                    pressedColor: root.pressedBlue
 
                     onClicked: {
                         console.log("Add exercise clicked")
@@ -114,11 +135,11 @@ Rectangle {
 
                 // Card Time in gym
                 Rectangle {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 120
-                    radius: 20
-                    color: "white"
-                    border.color: "#e0e0e0"
+                    Layout.preferredWidth: root.cardWidth
+                    Layout.preferredHeight: root.cardHeight
+                    radius: root.cardRadius
+                    color: root.cardBackground
+                    border.color: root.cardBorder
                     border.width: 1
 
                     Column {
@@ -131,23 +152,23 @@ Rectangle {
 
                             Text {
                                 text: "??"
-                                font.pixelSize: 32
+                                font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: "3h 20min"
-                                font.pixelSize: 28
+                                font.pixelSize: root.cardValueSize
                                 font.weight: Font.Bold
-                                color: "#2c3e50"
+                                color: root.darkText
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
 
                         Text {
                             text: "Time in gym"
-                            font.pixelSize: 16
-                            color: "#95a5a6"
+                            font.pixelSize: root.cardLabelSize
+                            color: root.lightText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
@@ -155,14 +176,14 @@ Rectangle {
 
                 // Botón Add program
                 Components.GenericButton {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 80
+                    Layout.preferredWidth: root.buttonWidth
+                    Layout.preferredHeight: root.buttonHeight
                     text: "?? Add program"
-                    fontSize: 18
-                    buttonRadius: 20
-                    normalColor: "#1E90FF"
-                    hoverColor: "#4169E1"
-                    pressedColor: "#0066CC"
+                    fontSize: root.buttonFontSize
+                    buttonRadius: root.buttonRadius
+                    normalColor: root.primaryBlue
+                    hoverColor: root.hoverBlue
+                    pressedColor: root.pressedBlue
 
                     onClicked: {
                         console.log("Add program clicked")
@@ -171,11 +192,11 @@ Rectangle {
 
                 // Card Time running
                 Rectangle {
-                    Layout.preferredWidth: 250
-                    Layout.preferredHeight: 120
-                    radius: 20
-                    color: "white"
-                    border.color: "#e0e0e0"
+                    Layout.preferredWidth: root.cardWidth
+                    Layout.preferredHeight: root.cardHeight
+                    radius: root.cardRadius
+                    color: root.cardBackground
+                    border.color: root.cardBorder
                     border.width: 1
 
                     Column {
@@ -188,23 +209,23 @@ Rectangle {
 
                             Text {
                                 text: "??"
-                                font.pixelSize: 32
+                                font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: "12 km"
-                                font.pixelSize: 28
+                                font.pixelSize: root.cardValueSize
                                 font.weight: Font.Bold
-                                color: "#2c3e50"
+                                color: root.darkText
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
 
                         Text {
                             text: "Time running"
-                            font.pixelSize: 16
-                            color: "#95a5a6"
+                            font.pixelSize: root.cardLabelSize
+                            color: root.lightText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
