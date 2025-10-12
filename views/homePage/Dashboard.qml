@@ -103,7 +103,7 @@ Rectangle {
                     }
                 }
 
-                // Botón Add exercise
+                // Add exercise button
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
@@ -160,7 +160,6 @@ Rectangle {
                     }
                 }
 
-                // Botón Add program
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
@@ -241,6 +240,20 @@ Rectangle {
                 color: "#7f8c8d"
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            Components.GenericButton {
+                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
+                Layout.preferredWidth: root.buttonWidth
+                Layout.preferredHeight: root.buttonHeight
+                text: "?? + Add seance"
+                normalColor: root.primaryBlue
+                hoverColor: root.hoverBlue
+                pressedColor: root.pressedBlue
+
+                onClicked: {
+                    console.log("Add seance clicked")
+                }
+            }
         }
     }
 
@@ -265,6 +278,20 @@ Rectangle {
                 color: "#7f8c8d"
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            Components.GenericButton {
+                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
+                Layout.preferredWidth: root.buttonWidth
+                Layout.preferredHeight: root.buttonHeight
+                text: "?? + Add exercise"
+                normalColor: root.primaryBlue
+                hoverColor: root.hoverBlue
+                pressedColor: root.pressedBlue
+
+                onClicked: {
+                    console.log("Add exercise clicked")
+                }
+            }
         }
     }
 
@@ -288,6 +315,20 @@ Rectangle {
                 font.pixelSize: 16
                 color: "#7f8c8d"
                 anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Components.GenericButton {
+                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
+                Layout.preferredWidth: root.buttonWidth
+                Layout.preferredHeight: root.buttonHeight
+                text: "?? + Add program"
+                normalColor: root.primaryBlue
+                hoverColor: root.hoverBlue
+                pressedColor: root.pressedBlue
+
+                onClicked: {
+                    console.log("Add program clicked")
+                }
             }
         }
     }
