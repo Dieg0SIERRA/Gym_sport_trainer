@@ -88,32 +88,18 @@ Rectangle {
                     }
                 }
 
-                // Card Calendar
-                Rectangle {
-                    Layout.preferredWidth: root.cardWidth
-                    Layout.preferredHeight: root.cardHeight
-                    radius: root.cardRadius
-                    color: root.cardBackground
-                    border.color: root.cardBorder
-                    border.width: 1
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 15
-
-                        Text {
-                            text: "??"
-                            font.pixelSize: 40
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Text {
-                            text: "Calendar"
-                            font.pixelSize: 24
-                            font.weight: Font.Bold
-                            color: root.darkText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                // calender widget
+                CalendarWidget {
+                    Layout.preferredWidth: 200
+                    Layout.preferredHeight: 200
+                    highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
+                    notes: {
+                        "2025-10-15": "Día de pierna",
+                        "2025-10-20": "Cardio",
+                        "2025-10-25": "Descanso"
+                    }
+                    onDateClicked: function(date) {
+                        console.log("Fecha seleccionada:", date)
                     }
                 }
 
