@@ -27,6 +27,7 @@ private:
     QSqlDatabase m_database;
 
     bool initializeDatabase();
+    QString hashPassword(const QString &password) const;
 };
 
 #endif // DATABASEMANAGER_H
