@@ -7,7 +7,10 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     
-    // Create DatabaseManager instance
+    QCoreApplication::setOrganizationName("ExerciseTracker");
+    QCoreApplication::setApplicationName("Exercise Tracker");
+	
+	// Create DatabaseManager instance
     DatabaseManager dbManager;    
 
     // Create and configure the QML engine
