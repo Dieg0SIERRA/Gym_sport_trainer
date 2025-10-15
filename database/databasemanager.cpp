@@ -43,7 +43,8 @@ bool DatabaseManager::initializeDatabase()
 
     qDebug() << "Database successfully opened at: " << dbPath;
 
-    return true;
+    // Create tables if they don't exist
+    return createTables();
 }
 
 bool DatabaseManager::createUser(const QString &username, const QString &password)
@@ -140,4 +141,27 @@ QString DatabaseManager::hashPassword(const QString &password) const
     QByteArray passwordData = password.toUtf8();
     QByteArray hash = QCryptographicHash::hash(passwordData, QCryptographicHash::Sha256);
     return QString(hash.toHex());
+}
+
+bool DatabaseManager::createTables()
+{
+    QSqlQuery query(m_database);
+
+    // Create table for the users
+    QString createUsersTable = R"(
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    )";
+
+    if (!query.exec(createUsersTable)) {
+        qWarning() << "Error creating table users:" << query.lastError().text();
+        return false;
+    }
+
+    qDebug() << "'users' table successfully verified/created";
+    return true;
 }

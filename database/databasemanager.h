@@ -28,6 +28,7 @@ private:
 
     bool initializeDatabase();
     QString hashPassword(const QString &password) const;
+    bool createTables();
 };
 
 #endif // DATABASEMANAGER_H
