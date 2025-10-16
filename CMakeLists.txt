@@ -50,9 +50,81 @@ set_target_properties(appGymTracker PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+# ============================================
+# INSTALL CONFIGURATION
+# ============================================
+
 include(GNUInstallDirs)
 install(TARGETS appGymTracker
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Install the Qt dependencies (DLLs on Windows, libraries on Linux/Mac)
+if(WIN32)
+    # Obtain the path to windeployqt
+    get_target_property(QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_BIN_DIR}")
+
+    if(WINDEPLOYQT_EXECUTABLE)
+        # Run windeployqt after installation
+        install(CODE "
+            execute_process(
+                COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
+                    --qmldir \"${CMAKE_SOURCE_DIR}\"
+                    --no-translations
+                    \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/appGymTracker.exe\"
+            )
+        " COMPONENT Runtime)
+    else()
+        message(WARNING "windeployqt no encontrado. Las DLLs de Qt deberán copiarse manualmente.")
+    endif()
+endif()
+
+# For Linux: use linuxdeploy or copy 
+if(UNIX AND NOT APPLE)
+    # Install Qt shared libraries
+    install(CODE "
+        file(GET_RUNTIME_DEPENDENCIES
+            EXECUTABLES \${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/appGymTracker
+            RESOLVED_DEPENDENCIES_VAR RESOLVED_DEPS
+            UNRESOLVED_DEPENDENCIES_VAR UNRESOLVED_DEPS
+        )
+        foreach(DEP \${RESOLVED_DEPS})
+            file(INSTALL
+                DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\"
+                TYPE SHARED_LIBRARY
+                FILES \"\${DEP}\"
+            )
+        endforeach()
+    ")
+endif()
+
+# For macOS: use macdeployqt
+if(APPLE)
+    get_target_property(QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QT_BIN_DIR}")
+
+    if(MACDEPLOYQT_EXECUTABLE)
+        install(CODE "
+            execute_process(
+                COMMAND \"${MACDEPLOYQT_EXECUTABLE}\"
+                    \"\${CMAKE_INSTALL_PREFIX}/appGymTracker.app\"
+                    -qmldir=\"${CMAKE_SOURCE_DIR}\"
+            )
+        " COMPONENT Runtime)
+    else()
+        message(WARNING "macdeployqt no encontrado.")
+    endif()
+endif()
+
+# Install additional QML files if necessary
+# (qt_add_qml_module already handles this automatically)
+
+# Create a clean installation directory
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Installation Directory" FORCE)
+
+message(STATUS " The application will be installed in: ${CMAKE_INSTALL_PREFIX}")
