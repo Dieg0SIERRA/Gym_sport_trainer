@@ -6,6 +6,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#Search for required Qt packages
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Sql)
+
 # Crear el ejecutable
 qt_add_executable(appGymTracker
     main.cpp
@@ -28,9 +31,6 @@ qt_add_qml_module(appGymTracker URI GymTracker VERSION 1.0
         views/homePage/SideBarItem.qml
         views/homePage/CalendarWidget.qml
 )
-
-#Search for required Qt packages
-find_package(Qt6 REQUIRED COMPONENTS Core Quick Sql)
 
 # Linking Qt libraries
 target_link_libraries(appGymTracker PRIVATE
