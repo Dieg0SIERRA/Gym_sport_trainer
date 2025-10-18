@@ -55,12 +55,54 @@ Rectangle {
                     font.weight: Font.Medium
                 }
 
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: exerciseNameField.activeFocus ? 2 : 1
+                    border.color: exerciseNameField.activeFocus ? "#6C63FF" : "#404040"
+
+                    TextField {
+                        id: exerciseNameField
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        placeholderText: "e.g., Bench Press"
+                        placeholderTextColor: "#666666"
+                        color: "#ffffff"
+                        background: Item {}
+                        font.pixelSize: 14
+                        selectByMouse: true
+                    }
+                }
+
                 // Repetitions
                 Text {
                     text: "Repetitions"
                     color: "#b0b0b0"
                     font.pixelSize: 14
                     font.weight: Font.Medium
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: repsField.activeFocus ? 2 : 1
+                    border.color: repsField.activeFocus ? "#6C63FF" : "#404040"
+
+                    TextField {
+                        id: repsField
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        placeholderText: "e.g., 3 X 10"
+                        placeholderTextColor: "#666666"
+                        color: "#ffffff"
+                        background: Item {}
+                        font.pixelSize: 14
+                        selectByMouse: true
+                    }
                 }
 
                 // Number of Series
@@ -71,12 +113,56 @@ Rectangle {
                     font.weight: Font.Medium
                 }
 
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: seriesField.activeFocus ? 2 : 1
+                    border.color: seriesField.activeFocus ? "#6C63FF" : "#404040"
+
+                    TextField {
+                        id: seriesField
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        placeholderText: "e.g., 3"
+                        placeholderTextColor: "#666666"
+                        color: "#ffffff"
+                        background: Item {}
+                        font.pixelSize: 14
+                        selectByMouse: true
+                        validator: IntValidator { bottom: 1; top: 99 }
+                    }
+                }
+
                 // Weight
                 Text {
                     text: "Weight (kg)"
                     color: "#b0b0b0"
                     font.pixelSize: 14
                     font.weight: Font.Medium
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: weightField.activeFocus ? 2 : 1
+                    border.color: weightField.activeFocus ? "#6C63FF" : "#404040"
+
+                    TextField {
+                        id: weightField
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        placeholderText: "e.g., 80.5"
+                        placeholderTextColor: "#666666"
+                        color: "#ffffff"
+                        background: Item {}
+                        font.pixelSize: 14
+                        selectByMouse: true
+                        validator: DoubleValidator { bottom: 0.0; top: 999.9; decimals: 1 }
+                    }
                 }
 
                 // Grip
@@ -87,7 +173,19 @@ Rectangle {
                     font.weight: Font.Medium
                 }
 
-                // Notes
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: gripCombo.pressed ? 2 : 1
+                    border.color: gripCombo.pressed ? "#6C63FF" : "#404040"
+                    
+                    // TODO: implementation of scroll menu options
+
+                }
+
+                // Notes (ocupa 2 columnas)
                 Text {
                     Layout.columnSpan: 2
                     text: "Notes"
@@ -95,7 +193,39 @@ Rectangle {
                     font.pixelSize: 14
                     font.weight: Font.Medium
                 }
+
+                Rectangle {
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 80
+                    color: "#1a1a1a"
+                    radius: 8
+                    border.width: notesArea.activeFocus ? 2 : 1
+                    border.color: notesArea.activeFocus ? "#6C63FF" : "#404040"
+
+                    Flickable {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        contentHeight: notesArea.contentHeight
+                        clip: true
+
+                        TextArea.flickable: TextArea {
+                            id: notesArea
+                            placeholderText: "Additional notes about the exercise..."
+                            placeholderTextColor: "#666666"
+                            color: "#ffffff"
+                            background: Item {}
+                            font.pixelSize: 14
+                            selectByMouse: true
+                            wrapMode: TextArea.Wrap
+                        }
+
+                        ScrollBar.vertical: ScrollBar {}
+                    }
+                }
             }
+            
+            // TODO: Add buttons for ok and cancel
         }
     }
 }
