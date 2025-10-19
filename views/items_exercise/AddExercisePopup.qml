@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import "../components" as Components
 
 Rectangle {
     id: root
@@ -287,8 +288,64 @@ Rectangle {
                     }
                 }
             }
-            
-            // TODO: Add buttons for ok and cancel
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 10
+                spacing: 15
+
+                Item { Layout.fillWidth: true } // Spacer
+
+                // Button cancel
+                Components.GenericButton {
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 45
+                    buttonRadius: 10
+                    color: cancelArea.pressed ? "#5a5a5a" :
+                           cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
+                    text: "Cancel"
+                    fontSize: 16
+                    normalColor: root.primaryBlue
+                    hoverColor: root.hoverBlue
+                    pressedColor: root.pressedBlue
+
+                    onClicked: {
+                        clearFields()
+                        root.visible = false
+                        root.cancelled()
+                    }
+                }
+
+                // Button Add Exercise
+                Components.GenericButton {
+                    Layout.preferredWidth: 150
+                    Layout.preferredHeight: 45
+                    buttonRadius: 10
+                    color: !isFormValid() ? "#404040" :
+                           addArea.pressed ? "#5A52E8" :
+                           addArea.containsMouse ? "#7B73FF" : "#6C63FF"
+                    text: "Add Exercise"
+                    fontSize: 16
+                    normalColor: root.primaryBlue
+                    hoverColor: root.hoverBlue
+                    pressedColor: root.pressedBlue
+
+                    onClicked: {
+                        if (isFormValid()) {
+                            root.exerciseAdded(
+                                exerciseNameField.text,
+                                repsField.text,
+                                parseInt(seriesField.text),
+                                parseFloat(weightField.text),
+                                gripCombo.currentText,
+                                notesArea.text
+                            )
+                            clearFields()
+                            root.visible = false
+                        }
+                    }
+                }
+            }
         }
     }
 }
