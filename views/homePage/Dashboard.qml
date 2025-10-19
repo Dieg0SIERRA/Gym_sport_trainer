@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import "../components" as Components
+import "../items_exercise" as ItemsExercise
 
 Rectangle {
     id: root
@@ -115,6 +116,7 @@ Rectangle {
                     pressedColor: root.pressedBlue
 
                     onClicked: {
+                    	addExercisePopup.show()
                         console.log("Add exercise clicked")
                     }
                 }
@@ -289,6 +291,7 @@ Rectangle {
                 pressedColor: root.pressedBlue
 
                 onClicked: {
+                	addExercisePopup.show()
                     console.log("Add exercise clicked")
                 }
             }
@@ -354,6 +357,21 @@ Rectangle {
                 color: "#7f8c8d"
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+        }
+    }
+
+    // Pop-up to add exercise
+    ItemsExercise.AddExercisePopup {
+        id: addExercisePopup
+        anchors.fill: parent
+
+        onExerciseAdded: function(name, reps, series, weight, grip, notes) {
+            console.log("Exercise added:", name, reps, series, weight, grip, notes)
+            // Here will be connect to DatabaseManager afterwards.
+        }
+
+        onCancelled: {
+            console.log("Exercise creation cancelled")
         }
     }
 }
