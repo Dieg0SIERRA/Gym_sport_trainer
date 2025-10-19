@@ -10,6 +10,9 @@ Rectangle {
     visible: false
     z: 1000
 
+    signal exerciseAdded(string name, string reps, int series, real weight, string grip, string notes)
+    signal cancelled()
+
     // Close pop-up when clicking outside
     MouseArea {
         anchors.fill: parent
@@ -26,6 +29,12 @@ Rectangle {
         border.width: 2
         border.color: "#6C63FF"
 
+        // Prevent the click from closing the pop-up
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {} // No hace nada, solo previene propagación
+        }
+
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 30
@@ -38,6 +47,14 @@ Rectangle {
                 color: "#ffffff"
                 font.pixelSize: 24
                 font.weight: Font.Bold
+            }
+
+            // Separator line
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 2
+                color: "#6C63FF"
+                opacity: 0.3
             }
 
             // Grid with fields
@@ -347,5 +364,26 @@ Rectangle {
                 }
             }
         }
+    }
+
+    function isFormValid() {
+        return exerciseNameField.text.trim() !== "" &&
+               repsField.text.trim() !== "" &&
+               seriesField.text.trim() !== "" &&
+               weightField.text.trim() !== ""
+    }
+
+    function clearFields() {
+        exerciseNameField.text = ""
+        repsField.text = ""
+        seriesField.text = ""
+        weightField.text = ""
+        gripCombo.currentIndex = 0
+        notesArea.text = ""
+    }
+
+    function show() {
+        clearFields()
+        root.visible = true
     }
 }
