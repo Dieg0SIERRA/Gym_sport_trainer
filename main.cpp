@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "database/DatabaseManager.h"
+#include "database/databasemanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Exercise Tracker");
 	
 	// Create DatabaseManager instance
-    DatabaseManager dbManager;    
+    DatabaseManager dbManager;
 
     // Create and configure the QML engine
     QQmlApplicationEngine engine;

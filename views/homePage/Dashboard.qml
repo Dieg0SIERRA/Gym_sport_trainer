@@ -72,7 +72,7 @@ Rectangle {
                 rowSpacing: root.gridSpacing
                 columnSpacing: root.gridSpacing
 
-                // Botón Add seance
+                // Button Add seance
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
@@ -94,9 +94,9 @@ Rectangle {
                     Layout.preferredHeight: 200
                     highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
                     notes: {
-                        "2025-10-15": "Día de pierna",
+                        "2025-10-15": "Leg day",
                         "2025-10-20": "Cardio",
-                        "2025-10-25": "Descanso"
+                        "2025-10-25": "Break"
                     }
                     onDateClicked: function(date) {
                         console.log("Fecha seleccionada:", date)

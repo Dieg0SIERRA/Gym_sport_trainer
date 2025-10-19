@@ -1,7 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import "views"
+import "views/login" as Login
+import "views/homePage" as HomePage
 
 
 ApplicationWindow {

@@ -16,7 +16,7 @@ qt_add_executable(appGymTracker
     database/databasemanager.cpp
 )
 
-# Añadir módulo QML
+# Add QML module
 qt_add_qml_module(appGymTracker URI GymTracker VERSION 1.0
     QML_FILES
         Main.qml
@@ -30,6 +30,7 @@ qt_add_qml_module(appGymTracker URI GymTracker VERSION 1.0
         views/homePage/Dashboard.qml
         views/homePage/SideBarItem.qml
         views/homePage/CalendarWidget.qml
+        views/items_exercise/AddExercisePopup.qml
 )
 
 # Linking Qt libraries
@@ -79,11 +80,11 @@ if(WIN32)
             )
         " COMPONENT Runtime)
     else()
-        message(WARNING "windeployqt no encontrado. Las DLLs de Qt deberán copiarse manualmente.")
+        message(WARNING "windeployqt not found. The Qt DLLs must be copied manually.")
     endif()
 endif()
 
-# For Linux: use linuxdeploy or copy 
+# For Linux: use linuxdeploy or copy
 if(UNIX AND NOT APPLE)
     # Install Qt shared libraries
     install(CODE "

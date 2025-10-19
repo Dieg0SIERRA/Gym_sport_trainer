@@ -88,7 +88,7 @@ bool DatabaseManager::validateLogin(const QString &username, const QString &pass
 {
     // Validar entrada
     if (username.trimmed().isEmpty() || password.isEmpty()) {
-        emit loginValidated(false, "Usuario y contraseña no pueden estar vacíos");
+        emit loginValidated(false, "Username and password cannot be left empty");
         return false;
     }
 
