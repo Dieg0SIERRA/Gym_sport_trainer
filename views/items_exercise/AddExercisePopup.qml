@@ -180,9 +180,72 @@ Rectangle {
                     radius: 8
                     border.width: gripCombo.pressed ? 2 : 1
                     border.color: gripCombo.pressed ? "#6C63FF" : "#404040"
-                    
-                    // TODO: implementation of scroll menu options
 
+                    ComboBox {
+                        id: gripCombo
+                        anchors.fill: parent
+                        anchors.margins: 1
+
+                        model: ["Prono", "Supino", "Neutro", "Mixto"]
+
+                        background: Rectangle {
+                            color: gripCombo.pressed ? "#3a3a3a" : "#1a1a1a"
+                            radius: 8
+                        }
+
+                        contentItem: Text {
+                            leftPadding: 10
+                            text: gripCombo.displayText
+                            color: "#ffffff"
+                            font.pixelSize: 14
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        indicator: Text {
+                            x: gripCombo.width - width - 10
+                            y: gripCombo.height / 2 - height / 2
+                            text: "▼"
+                            color: "#6C63FF"
+                            font.pixelSize: 12
+                        }
+
+                        popup: Popup {
+                            y: gripCombo.height + 2
+                            width: gripCombo.width
+                            padding: 1
+
+                            contentItem: ListView {
+                                clip: true
+                                implicitHeight: contentHeight
+                                model: gripCombo.popup.visible ? gripCombo.delegateModel : null
+                                currentIndex: gripCombo.highlightedIndex
+
+                                ScrollIndicator.vertical: ScrollIndicator {}
+                            }
+
+                            background: Rectangle {
+                                color: "#2a2a2a"
+                                border.color: "#6C63FF"
+                                border.width: 1
+                                radius: 8
+                            }
+                        }
+
+                        delegate: ItemDelegate {
+                            width: gripCombo.width
+                            contentItem: Text {
+                                text: modelData
+                                color: "#ffffff"
+                                font.pixelSize: 14
+                                verticalAlignment: Text.AlignVCenter
+                                leftPadding: 10
+                            }
+                            background: Rectangle {
+                                color: parent.highlighted ? "#6C63FF" : "#2a2a2a"
+                                opacity: parent.highlighted ? 0.8 : 1.0
+                            }
+                        }
+                    }
                 }
 
                 // Notes (ocupa 2 columnas)
