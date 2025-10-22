@@ -65,6 +65,38 @@ Rectangle {
         }
         
         // Search/filter bar
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 50
+            color: "white"
+            radius: 25
+            border.color: searchField.activeFocus ? "#1E90FF" : "#e0e0e0"
+            border.width: 2
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: 15
+                spacing: 10
+
+                Text {
+                    text: "🔍"
+                    font.pixelSize: 18
+                }
+
+                TextField {
+                    id: searchField
+                    Layout.fillWidth: true
+                    placeholderText: "Search exercises..."
+                    placeholderTextColor: "#95a5a6"
+                    color: "#2c3e50"
+                    background: Item {}
+                    font.pixelSize: 15
+                    selectByMouse: true
+
+                    // onTextChanged: filterExercises()
+                }
+            }
+        }
         
         // Exercise list
     }    
