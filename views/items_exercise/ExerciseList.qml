@@ -132,7 +132,7 @@ Rectangle {
                 }
             }
 
-            // ScrollView con la lista
+            // ScrollView in the list
             ScrollView {
                 anchors.fill: parent
                 visible: filteredModel.count > 0
@@ -150,7 +150,126 @@ Rectangle {
                     //TODO: Exercise information
                 }
             }
-
         }
-    }    
+    }
+
+    // Delete an exercise of the list
+    Rectangle {
+        id: deleteConfirmDialog
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.7)
+        visible: false
+        z: 1000
+
+        property int exerciseIdToDelete: -1
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: deleteConfirmDialog.visible = false
+        }
+
+        Rectangle {
+            width: 350
+            height: 200
+            anchors.centerIn: parent
+            color: "#2a2a2a"
+            radius: 15
+            border.width: 2
+            border.color: "#d04040"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {}
+            }
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 25
+                spacing: 20
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "⚠️"
+                    font.pixelSize: 48
+                    color: "#d04040"
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    text: "Delete Exercise?"
+                    font.pixelSize: 18
+                    font.weight: Font.Bold
+                    color: "#ffffff"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    text: "This action cannot be undone"
+                    font.pixelSize: 13
+                    color: "#95a5a6"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.topMargin: 10
+                    spacing: 15
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 45
+                        color: cancelDeleteArea.pressed ? "#5a5a5a" :
+                               cancelDeleteArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
+                        radius: 10
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            color: "#ffffff"
+                            font.pixelSize: 15
+                            font.weight: Font.Medium
+                        }
+
+                        MouseArea {
+                            id: cancelDeleteArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: deleteConfirmDialog.visible = false
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 45
+                        color: confirmDeleteArea.pressed ? "#c0392b" :
+                               confirmDeleteArea.containsMouse ? "#e74c3c" : "#d04040"
+                        radius: 10
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Delete"
+                            color: "#ffffff"
+                            font.pixelSize: 15
+                            font.weight: Font.Bold
+                        }
+
+                        MouseArea {
+                            id: confirmDeleteArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.deleteExercise(deleteConfirmDialog.exerciseIdToDelete)
+                                deleteConfirmDialog.visible = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
