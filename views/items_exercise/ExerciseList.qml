@@ -9,6 +9,9 @@ Rectangle {
     
     property int userId: -1
     property var exercises: []
+    signal refreshRequested()
+    signal editExercise(int exerciseId)
+    signal deleteExercise(int exerciseId)
        
     ColumnLayout {
         anchors.fill: parent
@@ -271,5 +274,46 @@ Rectangle {
                 }
             }
         }
+    }
+
+    // functions
+    function loadExercises() {
+        if (root.userId <= 0) {
+            console.log("No userId set, cannot load exercises")
+            return
+        }
+
+        console.log("Loading exercises for userId:", root.userId)
+        root.exercises = DatabaseManager.getExercisesByUser(root.userId)
+        console.log("Loaded exercises:", root.exercises.length)
+        filterExercises()
+    }
+
+    function filterExercises() {
+        filteredModel.clear()
+
+        var searchText = searchField.text.toLowerCase()
+
+        for (var i = 0; i < root.exercises.length; i++) {
+            var exercise = root.exercises[i]
+
+            // If there is search text, filter
+            if (searchText !== "") {
+                var nameMatch = exercise.name.toLowerCase().includes(searchText)
+                var gripMatch = exercise.grip.toLowerCase().includes(searchText)
+                var notesMatch = exercise.notes.toLowerCase().includes(searchText)
+
+                if (!nameMatch && !gripMatch && !notesMatch) {
+                    continue
+                }
+            }
+
+            filteredModel.append(exercise)
+        }
+    }
+
+    // Public function for recharging from outside
+    function refresh() {
+        loadExercises()
     }
 }
