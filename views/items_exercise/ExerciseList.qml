@@ -99,5 +99,58 @@ Rectangle {
         }
         
         // Exercise list
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "transparent"
+
+            // Message when there are not exercise in the list
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+                visible: filteredModel.count === 0
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "📭"
+                    font.pixelSize: 64
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: searchField.text !== "" ? "No exercises found" : "No exercises yet"
+                    font.pixelSize: 20
+                    font.weight: Font.Medium
+                    color: "#7f8c8d"
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: searchField.text !== "" ? "Try a different search" : "Click '+ Add exercise' to get started"
+                    font.pixelSize: 14
+                    color: "#95a5a6"
+                }
+            }
+
+            // ScrollView con la lista
+            ScrollView {
+                anchors.fill: parent
+                visible: filteredModel.count > 0
+                clip: true
+
+                ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                ListView {
+                    id: exerciseListView
+                    anchors.fill: parent
+                    spacing: 15
+                    model: filteredModel
+
+                    //TODO: Exercise information
+                }
+            }
+
+        }
     }    
 }
