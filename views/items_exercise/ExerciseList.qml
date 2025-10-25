@@ -12,7 +12,13 @@ Rectangle {
     signal refreshRequested()
     signal editExercise(int exerciseId)
     signal deleteExercise(int exerciseId)
-       
+
+    onUserIdChanged: {
+        if (userId > 0) {
+            loadExercises()
+        }
+    }
+    
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
@@ -154,6 +160,10 @@ Rectangle {
                 }
             }
         }
+    }
+    
+    ListModel {
+        id: filteredModel
     }
 
     // Delete an exercise of the list
