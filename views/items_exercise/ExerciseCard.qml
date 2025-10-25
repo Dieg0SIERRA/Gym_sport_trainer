@@ -33,6 +33,22 @@ Rectangle {
         NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
     }
     
+    // Sombra
+    layer.enabled: true
+    layer.effect: ShaderEffect {
+        property color shadowColor: Qt.rgba(0, 0, 0, 0.1)
+        fragmentShader: "
+            varying highp vec2 qt_TexCoord0;
+            uniform sampler2D source;
+            uniform lowp vec4 shadowColor;
+            uniform lowp float qt_Opacity;
+            void main() {
+                lowp vec4 p = texture2D(source, qt_TexCoord0);
+                gl_FragColor = mix(shadowColor, p, p.a) * qt_Opacity;
+            }
+        "
+    }
+    
     MouseArea {
         anchors.fill: parent
         onClicked: root.expanded = !root.expanded
@@ -99,6 +115,13 @@ Rectangle {
                     }
                 }
             }
+            
+            // Expand indicator
+            Text {
+                text: root.expanded ? "▲" : "▼"
+                font.pixelSize: 16
+                color: "#1E90FF"
+            }
         }
         
         // Details
@@ -111,6 +134,13 @@ Rectangle {
             
             Behavior on opacity {
                 NumberAnimation { duration: 200 }
+            }
+            
+            // separator line
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+                color: "#e0e0e0"
             }
             
             // Information
