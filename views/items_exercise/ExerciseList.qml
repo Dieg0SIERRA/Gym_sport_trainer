@@ -155,8 +155,27 @@ Rectangle {
                     anchors.fill: parent
                     spacing: 15
                     model: filteredModel
-
-                    //TODO: Exercise information
+                    
+                    delegate: ExerciseCard {
+                        width: exerciseListView.width
+                        exerciseId: model.id
+                        exerciseName: model.name
+                        repetitions: model.repetitions
+                        series: model.series
+                        weight: model.weight
+                        grip: model.grip
+                        notes: model.notes
+                        createdAt: model.created_at
+                        
+                        onEditClicked: function(id) {
+                            root.editExercise(id)
+                        }
+                        
+                        onDeleteClicked: function(id) {
+                            deleteConfirmDialog.exerciseIdToDelete = id
+                            deleteConfirmDialog.visible = true
+                        }
+                    }
                 }
             }
         }
