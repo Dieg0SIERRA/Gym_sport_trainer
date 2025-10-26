@@ -9,6 +9,7 @@ Rectangle {
     
     property int userId: -1
     property var exercises: []
+    
     signal refreshRequested()
     signal editExercise(int exerciseId)
     signal deleteExercise(int exerciseId)
@@ -69,6 +70,8 @@ Rectangle {
 
                 onClicked: {
                     // refresh exercise list
+                    loadExercises()
+                    root.refreshRequested()
                 }
             }
         }
@@ -102,7 +105,7 @@ Rectangle {
                     font.pixelSize: 15
                     selectByMouse: true
 
-                    // onTextChanged: filterExercises()
+                    onTextChanged: filterExercises()
                 }
             }
         }
