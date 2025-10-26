@@ -9,6 +9,7 @@ Rectangle {
     color: "#ecf0f1"
 
     property string currentSection: "home"
+    property int currentUserId: 1  // ID of the currently logged-in user
 
     // ===== Constants for graphic design =====
     readonly property color primaryBlue: "#1E90FF"
@@ -30,6 +31,41 @@ Rectangle {
     readonly property int cardValueSize: 28
     readonly property int cardLabelSize: 16
     readonly property int cardEmojiSize: 32
+
+    // Add connections with DatabaseManager for exercises
+    Connections {
+        target: DatabaseManager
+        
+        function onExerciseAdded(success, message) {
+            if (success) {
+                console.log("? Ejercicio agregado exitosamente")
+                // Recargar la lista de ejercicios
+                exerciseListComponent.refresh()
+            } else {
+                console.log("? Error al agregar ejercicio:", message)
+            }
+        }
+        
+        function onExerciseDeleted(success, message) {
+            if (success) {
+                console.log("? Ejercicio eliminado exitosamente")
+                // Recargar la lista de ejercicios
+                exerciseListComponent.refresh()
+            } else {
+                console.log("? Error al eliminar ejercicio:", message)
+            }
+        }
+        
+        function onExerciseUpdated(success, message) {
+            if (success) {
+                console.log("? Ejercicio actualizado exitosamente")
+                // Recargar la lista de ejercicios
+                exerciseListComponent.refresh()
+            } else {
+                console.log("? Error al actualizar ejercicio:", message)
+            }
+        }
+    }
 
     // Charging content dynamically depending on section
     Loader {
@@ -367,7 +403,23 @@ Rectangle {
 
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
             console.log("Exercise added:", name, reps, series, weight, grip, notes)
-            // Here will be connect to DatabaseManager afterwards.
+            
+            // Validate that we have a valid userId
+            if (root.currentUserId <= 0) {
+                console.error("Error: userId no válido:", root.currentUserId)
+                return
+            }
+            
+            // Call DatabaseManager to save the exercise
+            DatabaseManager.addExercise(
+                root.currentUserId,
+                name,
+                reps,
+                series,
+                weight,
+                grip,
+                notes
+            )
         }
 
         onCancelled: {
