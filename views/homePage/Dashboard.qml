@@ -35,32 +35,38 @@ Rectangle {
     // Add connections with DatabaseManager for exercises
     Connections {
         target: DatabaseManager
-        
+
         function onExerciseAdded(success, message) {
             if (success) {
                 console.log("? Ejercicio agregado exitosamente")
-                // Recargar la lista de ejercicios
-                exerciseListComponent.refresh()
+                // Re-loading the exercise list
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
             } else {
                 console.log("? Error al agregar ejercicio:", message)
             }
         }
-        
+
         function onExerciseDeleted(success, message) {
             if (success) {
                 console.log("? Ejercicio eliminado exitosamente")
-                // Recargar la lista de ejercicios
-                exerciseListComponent.refresh()
+                // Re-loading the exercise list
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
             } else {
                 console.log("? Error al eliminar ejercicio:", message)
             }
         }
-        
+
         function onExerciseUpdated(success, message) {
             if (success) {
                 console.log("? Ejercicio actualizado exitosamente")
-                // Recargar la lista de ejercicios
-                exerciseListComponent.refresh()
+                // Re-loading the exercise list
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
             } else {
                 console.log("? Error al actualizar ejercicio:", message)
             }
