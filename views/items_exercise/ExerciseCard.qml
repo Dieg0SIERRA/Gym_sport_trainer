@@ -34,21 +34,16 @@ Rectangle {
     }
     
     // Sombra
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        property color shadowColor: Qt.rgba(0, 0, 0, 0.1)
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform sampler2D source;
-            uniform lowp vec4 shadowColor;
-            uniform lowp float qt_Opacity;
-            void main() {
-                lowp vec4 p = texture2D(source, qt_TexCoord0);
-                gl_FragColor = mix(shadowColor, p, p.a) * qt_Opacity;
-            }
-        "
-    }
-    
+    MultiEffect {
+            anchors.fill: parent
+            source: parent
+            shadowEnabled: true
+            shadowColor: Qt.rgba(0, 0, 0, 0.2)
+            shadowBlur: 0.3
+            shadowHorizontalOffset: 0
+            shadowVerticalOffset: 6
+        }
+
     MouseArea {
         anchors.fill: parent
         onClicked: root.expanded = !root.expanded
