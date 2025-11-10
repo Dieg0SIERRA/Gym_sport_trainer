@@ -67,35 +67,7 @@ Rectangle {
         }
     }
 
-    // Charging content dynamically depending on section
-    Loader {
-        id: contentLoader
-        anchors.fill: parent
-        anchors.margins: 20
-
-        sourceComponent: {
-            switch(root.currentSection) {
-                case "home":     return homeContent
-                case "seance":   return seanceContent
-                case "exercise": return exerciseContent
-                case "program":  return programContent
-                case "stats":    return statsContent
-                default:         return homeContent
-            }
-        }
-
-        // transition when changing of content
-        Behavior on opacity {
-            NumberAnimation { duration: 200 }
-        }
-
-        onSourceComponentChanged: {
-            opacity = 0
-            opacity = 1
-        }
-    }
-
-    // ===== definition of each component =====
+    // ===== COMPONENTES DE CONTENIDO =====
 
     Component {
         id: homeContent
@@ -393,6 +365,34 @@ Rectangle {
                 color: "#7f8c8d"
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+        }
+    }
+
+    // Charging content dynamically depending on section
+    Loader {
+        id: contentLoader
+        anchors.fill: parent
+        anchors.margins: 20
+
+        sourceComponent: {
+            switch(root.currentSection) {
+                case "home":     return homeContent
+                case "seance":   return seanceContent
+                case "exercise": return exerciseContent
+                case "program":  return programContent
+                case "stats":    return statsContent
+                default:         return homeContent
+            }
+        }
+
+        // transition when changing of content
+        Behavior on opacity {
+            NumberAnimation { duration: 200 }
+        }
+
+        onSourceComponentChanged: {
+            opacity = 0
+            opacity = 1
         }
     }
 
