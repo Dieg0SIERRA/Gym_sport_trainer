@@ -163,10 +163,10 @@ Rectangle {
                         enabled: parent.isCurrentMonth
                         hoverEnabled: true
 
-                        onEntered: (mouse) => {
+                        onPositionChanged: (mouse) => {
                             if (parent.hasNote) {
                                 tooltip.text = notes[parent.dateString]
-                                tooltip.x = mouse.x + parent.x
+                                tooltip.x = mouse.x + parent.x + 10
                                 tooltip.y = mouse.y + parent.y - tooltip.height - 10
                                 tooltip.visible = true
                             }
