@@ -163,16 +163,16 @@ Rectangle {
                         enabled: parent.isCurrentMonth
                         hoverEnabled: true
 
-                        onEntered: {
+                        onEntered: (mouse) => {
                             if (parent.hasNote) {
                                 tooltip.text = notes[parent.dateString]
+                                tooltip.x = mouse.x + parent.x
+                                tooltip.y = mouse.y + parent.y - tooltip.height - 10
                                 tooltip.visible = true
                             }
                         }
 
-                        onExited: {
-                            tooltip.visible = false
-                        }
+                        onExited: tooltip.visible = false
 
                         onClicked: {
                             if (parent.isCurrentMonth) {
@@ -197,9 +197,6 @@ Rectangle {
         z: 100
 
         property alias text: tooltipText.text
-
-        x: Math.min(root.width - width - 10, Math.max(10, mouseX))
-        y: mouseY - height - 10
 
         Text {
             id: tooltipText
