@@ -1,15 +1,21 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 #include "database/databasemanager.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    
+
+    //QQuickStyle::setStyle("Material");
+    QQuickStyle::setStyle("Fusion");
+    // o: QQuickStyle::setStyle("Basic");
+
+    // Configurar información de la aplicación (usado por QStandardPaths)
     QCoreApplication::setOrganizationName("ExerciseTracker");
     QCoreApplication::setApplicationName("Exercise Tracker");
-	
+
 	// Create DatabaseManager instance
     DatabaseManager dbManager;
 
@@ -23,10 +29,8 @@ int main(int argc, char *argv[])
     const QUrl url(QStringLiteral("qrc:/GymTracker/Main.qml"));
 
     QObject::connect(
-    	&engine,
-        &QQmlApplicationEngine::objectCreated,
-        &app,
-        [url](QObject *obj, const QUrl &objUrl) {
+        &engine, &QQmlApplicationEngine::objectCreated,
+        &app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
         },
