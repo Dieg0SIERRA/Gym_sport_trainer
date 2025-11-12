@@ -5,7 +5,9 @@ Rectangle {
     id: root
 
     // Customizables properties
-    property string text:         "Button"
+    property string text:         "Button"      // values: "topLeft", "topRight", "bottomLeft", "bottomRight", "center"
+    property real margin:         20            // margin from the borders
+    property string position:     "center"
     property color normalColor:   "#6C63FF"
     property color hoverColor:    "#7B73FF"
     property color pressedColor:  "#5A52E8"
