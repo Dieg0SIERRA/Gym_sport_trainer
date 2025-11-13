@@ -105,8 +105,8 @@ Rectangle {
 
                 // calender widget
                 CalendarWidget {
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 200
+                    Layout.preferredWidth: 350
+                    Layout.preferredHeight: 350
                     highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
                     notes: {
                         "2025-10-15": "Leg day",

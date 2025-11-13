@@ -36,7 +36,7 @@ Rectangle {
 
             Text {
                 text: "◀"
-                font.pixelSize: 16
+                font.pixelSize: 32
                 color: "#2c3e50"
 
                 MouseArea {
@@ -56,7 +56,7 @@ Rectangle {
             Text {
                 Layout.fillWidth: true
                 text: getMonthName(currentMonth) + " " + currentYear
-                font.pixelSize: 14
+                font.pixelSize: 40
                 font.weight: Font.Bold
                 color: "#2c3e50"
                 horizontalAlignment: Text.AlignHCenter
@@ -64,7 +64,7 @@ Rectangle {
 
             Text {
                 text: "▶"
-                font.pixelSize: 16
+                font.pixelSize: 32
                 color: "#2c3e50"
 
                 MouseArea {
@@ -86,17 +86,17 @@ Rectangle {
         GridLayout {
             Layout.fillWidth: true
             columns: 7
-            columnSpacing: 2
-            rowSpacing: 2
+            columnSpacing: 4
+            rowSpacing: 4
 
             Repeater {
                 model: ["L", "M", "X", "J", "V", "S", "D"]
 
                 Text {
-                    Layout.preferredWidth: 20
-                    Layout.preferredHeight: 15
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 30
                     text: modelData
-                    font.pixelSize: 10
+                    font.pixelSize: 30
                     font.weight: Font.Bold
                     color: "#7f8c8d"
                     horizontalAlignment: Text.AlignHCenter
@@ -111,16 +111,16 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             columns: 7
-            columnSpacing: 2
-            rowSpacing: 2
+            columnSpacing: 4
+            rowSpacing: 4
 
             Repeater {
                 id: daysRepeater
                 model: 42 // 6 weeks maximum
 
                 Rectangle {
-                    Layout.preferredWidth: 20
-                    Layout.preferredHeight: 20
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
 
                     property int dayNumber: getDayNumber(index)
                     property bool isCurrentMonth: dayNumber > 0
@@ -140,16 +140,16 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: dayNumber > 0 ? dayNumber : ""
-                        font.pixelSize: 10
+                        font.pixelSize: 24
                         color: (parent.isToday || parent.isHighlighted) ? "white" : "#2c3e50"
                         font.weight: parent.isToday ? Font.Bold : Font.Normal
                     }
 
                     // Note indicator
                     Rectangle {
-                        width: 4
-                        height: 4
-                        radius: 2
+                        width: 8
+                        height: 8
+                        radius: 4
                         color: parent.isToday || parent.isHighlighted ? "white" : highlightColor
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 2
@@ -190,10 +190,10 @@ Rectangle {
     Rectangle {
         id: tooltip
         visible: false
-        width: tooltipText.width + 16
-        height: tooltipText.height + 12
-        color: "#2c3e50"
-        radius: 6
+        width: tooltipText.width + 20
+        height: tooltipText.height + 16
+        color: "#3bd1c7"
+        radius: 10
         z: 100
 
         property alias text: tooltipText.text
@@ -202,7 +202,9 @@ Rectangle {
             id: tooltipText
             anchors.centerIn: parent
             color: "white"
-            font.pixelSize: 10
+            font.family: "Comic Sans MS"
+            font.weight: Font.italic
+            font.pixelSize: 30
             padding: 4
         }
     }
