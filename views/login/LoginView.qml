@@ -106,6 +106,66 @@ Item {
         }
     }
 
+    // Popup de error
+    Rectangle {
+        id: errorPopup
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.7)
+        visible: showErrorPopup
+        z: 1000
+
+        Rectangle {
+            width: 320
+            height: 220
+            anchors.centerIn: parent
+            color: "#2a2a2a"
+            radius: 15
+            border.width: 2
+            border.color: "#d04040"
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                anchors.margins: 20
+                width: parent.width - 40
+                spacing: 20
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "✗"
+                    color: "#d04040"
+                    font.pixelSize: 40
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    text: errorMessage
+                    color: "#ffffff"
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                }
+
+                // OK Button
+                Components.GenericButton {
+                    Layout.preferredWidth: 100
+                    Layout.preferredHeight: 40
+                    Layout.alignment: Qt.AlignHCenter
+
+                    width: 200; height: 50; buttonRadius: 8; fontSize: 18;
+                    normalColor: "#d04040"
+                    hoverColor: "#e05050"
+                    text: "OK"
+                    onClicked: {
+                        showErrorPopup = false
+                        errorMessage = ""
+                    }
+                }
+            }
+        }
+    }
+
     // --- Start screen with buttons ---
     Column {
         id: startMenu
