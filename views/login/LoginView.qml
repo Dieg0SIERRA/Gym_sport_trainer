@@ -7,13 +7,39 @@ Item {
     id: root
     signal loginSuccess()
     property string currentView: "menu"     // values: "menu", "login", "create"
-    // signal navigateToHomepage()  // Nueva señal
 
     // Validation properties
     property bool isUsernameValid: false
     property bool isPasswordValid: false
     property bool isConfirmPasswordValid: false
     property bool showSuccessPopup: false
+    property bool showErrorPopup: false
+    property string errorMessage: ""
+    
+    property string loggedUsername: ""
+
+    // Connetion with DatabaseManager
+    Connections {
+        target: DatabaseManager
+
+        function onUserCreated(success, message) {
+            if (success) {
+                showSuccessPopup = true
+            } else {
+                errorMessage = message
+                showErrorPopup = true
+            }
+        }
+
+        function onLoginValidated(success, message) {
+            if (success) {
+                navigateToHomepage()
+            } else {
+                errorMessage = message
+                showErrorPopup = true
+            }
+        }
+    }
 
     Image {
         id: backgroundImage
@@ -363,10 +389,16 @@ Item {
     // Función para manejar la creación de cuenta
     function handleAccountCreation() {
         console.log("Creating account for:", usernameField.text)
-        // Aquí se conectará con SQLite después
 
-        // Mostrar popup de éxito
-        showSuccessPopup = true
+        // Llamar al DatabaseManager para crear el usuario
+        DatabaseManager.createUser(usernameField.text, passwordField.text)
+    }
+
+    function handleLogin() {
+        console.log("Attempting login for:", userField.text)
+
+        // Call DatabaseManager to login validation
+        DatabaseManager.validateLogin(userField.text, passField.text)
     }
 
     function navigateToHomepage() {
