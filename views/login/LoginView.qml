@@ -269,9 +269,9 @@ Item {
                 }
 
                 isValid: isPasswordValid
-                validationMessage: usernameField.text.length === 0 ? "" :
+                validationMessage: passwordField.text.length === 0 ? "" :
                         isPasswordValid ? "✓ Strong password" : "✗ Must include: A-Z, a-z, 0-9, special chars"
-                showValidation: usernameField.text.length > 0
+                showValidation: passwordField.text.length > 0
             }
 
             // Confirm Password field
@@ -290,7 +290,7 @@ Item {
                 isValid: isConfirmPasswordValid
                 validationMessage: confirmPasswordField.text.length === 0 ? "" :
                         isConfirmPasswordValid ? "✓ Passwords match" : "✗ Passwords don't match"
-                showValidation: usernameField.text.length > 0
+                showValidation: confirmPasswordField.text.length > 0
             }
 
             // Create Account button
@@ -343,14 +343,13 @@ Item {
             Components.GenericButton {
                 Layout.alignment: Qt.AlignLeft
                 width: 80; height: 35; fontSize: 14; buttonRadius: 8
-                text: " Back"
+                text: "Back"
 
                 onClicked: {
                     root.currentView = "menu"
                     // Cleaning fields
-                    usernameField.text = ""
-                    passwordField.text = ""
-                    confirmPasswordField.text = ""
+                    userField.text = ""
+                    passField.text = ""
                 }
             }
 
@@ -383,6 +382,7 @@ Item {
                 labelFontSize:14
                 labelText: "Password"
                 placeholderText: "Enter Password"
+                isPassword: true
             }
 
             // Login button
@@ -394,12 +394,9 @@ Item {
 
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18
                 text: "Login"
-                // enabled:
+                enabled: userField.text.trim() !== "" && passField.text.trim() !== ""
 
-                onClicked: {
-                    if (userField.text.trim() !== "" && passwordField.text.trim() !== "")
-                        loginSuccess()
-                }
+                onClicked: handleLogin()
             }
 
             // Help field : Forgot your password ?

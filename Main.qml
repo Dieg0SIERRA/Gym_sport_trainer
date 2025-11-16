@@ -38,8 +38,15 @@ ApplicationWindow {
     Component {
         id: loginPage
         Login.LoginView {
+            id: loginView
+
             onLoginSuccess: {
-                // if login successful change to "home"
+                // Getting user ID before change view
+                window.currentUsername = loginView.loggedUsername
+                window.currentUserId = DatabaseManager.getUserId(window.currentUsername)
+
+                console.log("login successful - User ID:", window.currentUserId, "Username:", window.currentUsername)
+
                 window.appState = "home"
             }
         }
