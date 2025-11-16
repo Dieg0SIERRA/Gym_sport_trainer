@@ -14,12 +14,24 @@ ApplicationWindow {
 
     property string appState: "login"
 
+    // Property to store user ID
+    property int currentUserId: -1
+    property string currentUsername: ""
+
     // Main container for views
     Loader {
         id: mainLoader
         anchors.fill: parent
 
         sourceComponent: appState === "login" ? loginPage : homePage
+
+        // giving user ID to component
+        onLoaded: {
+            if (appState === "home" && item) {
+                item.currentUserId = window.currentUserId
+                item.currentUsername = window.currentUsername
+            }
+        }
     }
 
     // --- Login Page ---
