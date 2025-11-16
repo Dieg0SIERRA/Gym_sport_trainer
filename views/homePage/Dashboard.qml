@@ -91,7 +91,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "+ Add seance"
+                    text: "?? + Add seance"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -122,7 +122,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "+ Add exercise"
+                    text: "?? + Add exercise"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -179,7 +179,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? Add program"
+                    text: "?? + Add program"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -408,7 +408,8 @@ Rectangle {
         anchors.fill: parent
 
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
-            console.log("Exercise added:", name, reps, series, weight, grip, notes)
+            console.log("Adding exercise for userId:", root.currentUserId)
+            console.log("data:", name, reps, series, weight, grip, notes)
             
             // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
