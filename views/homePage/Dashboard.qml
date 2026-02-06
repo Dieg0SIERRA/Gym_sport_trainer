@@ -278,38 +278,19 @@ Rectangle {
     Component {
         id: exerciseContent
 
-        Column {
-            anchors.centerIn: parent
-            spacing: 20
-
-            Text {
-                text: "EXERCISE"
-                font.pixelSize: 32
-                font.weight: Font.Bold
-                color: "#2c3e50"
-                anchors.horizontalCenter: parent.horizontalCenter
+        ItemsExercise.ExerciseList {
+            id: exerciseListComponent
+            anchors.fill: parent
+            userId: root.currentUserId
+            
+            onEditExercise: function(exerciseId) {
+                console.log("Edit exercise:", exerciseId)
+                // TODO: Implementar edición de ejercicio
             }
-
-            Text {
-                text: "Library of exercises"
-                font.pixelSize: 16
-                color: "#7f8c8d"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Components.GenericButton {
-                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
-                Layout.preferredWidth: root.buttonWidth
-                Layout.preferredHeight: root.buttonHeight
-                text: "?? + Add exercise"
-                normalColor: root.primaryBlue
-                hoverColor: root.hoverBlue
-                pressedColor: root.pressedBlue
-
-                onClicked: {
-                	addExercisePopup.show()
-                    console.log("Add exercise clicked")
-                }
+            
+            onDeleteExercise: function(exerciseId) {
+                console.log("Delete exercise:", exerciseId)
+                DatabaseManager.deleteExercise(exerciseId)
             }
         }
     }
