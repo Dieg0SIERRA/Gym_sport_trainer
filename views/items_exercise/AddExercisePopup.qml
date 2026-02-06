@@ -19,6 +19,7 @@ Rectangle {
         onClicked: root.visible = false
     }
 
+    // Main container
     Rectangle {
         id: formContainer
         width: 600

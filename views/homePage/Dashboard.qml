@@ -38,42 +38,42 @@ Rectangle {
 
         function onExerciseAdded(success, message) {
             if (success) {
-                console.log("? Ejercicio agregado exitosamente")
+                console.log("Ejercicio agregado exitosamente")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
                 }
             } else {
-                console.log("? Error al agregar ejercicio:", message)
+                console.log("Error when adding exercise:", message)
             }
         }
 
         function onExerciseDeleted(success, message) {
             if (success) {
-                console.log("? Ejercicio eliminado exitosamente")
+                console.log("Ejercicio eliminado exitosamente")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
                 }
             } else {
-                console.log("? Error al eliminar ejercicio:", message)
+                console.log("Error when deleting exercise:", message)
             }
         }
 
         function onExerciseUpdated(success, message) {
             if (success) {
-                console.log("? Ejercicio actualizado exitosamente")
+                console.log("Ejercicio actualizado exitosamente")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
                 }
             } else {
-                console.log("? Error al actualizar ejercicio:", message)
+                console.log("Error when updating exercise:", message)
             }
         }
     }
 
-    // ===== COMPONENTES DE CONTENIDO =====
+    // ===== COMPONENTS OF THE CONTENT =====
 
     Component {
         id: homeContent
@@ -114,7 +114,7 @@ Rectangle {
                         "2025-10-25": "Break"
                     }
                     onDateClicked: function(date) {
-                        console.log("Fecha seleccionada:", date)
+                        console.log("date selected:", date)
                     }
                 }
 
@@ -176,6 +176,7 @@ Rectangle {
                     }
                 }
 
+                // Add program button
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
@@ -257,6 +258,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            // Add seance button
             Components.GenericButton {
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18;
                 Layout.preferredWidth: root.buttonWidth
