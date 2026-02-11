@@ -12,7 +12,12 @@ Rectangle {
     property string currentSection: "home"
     property int currentUserId: 1  // ID of the currently logged-in user
 
-    // ===== Constants for graphic design =====
+    property var calendarNoteData: ({
+        "2025-02-15": {text: "Leg day", color: "#FF6B6B"},
+        "2025-02-20": {text: "Cardio", color: "#4ECDC4"},
+        "2025-02-25": {text: "Break", color: "#F7DC6F"}
+    })
+
     readonly property color primaryBlue: "#1E90FF"
     readonly property color hoverBlue: "#4169E1"
     readonly property color pressedBlue: "#0066CC"
@@ -39,7 +44,7 @@ Rectangle {
 
         function onExerciseAdded(success, message) {
             if (success) {
-                console.log("Ejercicio agregado exitosamente")
+                console.log("Exercise added successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
@@ -51,7 +56,7 @@ Rectangle {
 
         function onExerciseDeleted(success, message) {
             if (success) {
-                console.log("Ejercicio eliminado exitosamente")
+                console.log("Exercise deleted successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
@@ -63,7 +68,7 @@ Rectangle {
 
         function onExerciseUpdated(success, message) {
             if (success) {
-                console.log("Ejercicio actualizado exitosamente")
+                console.log("Exercise updated successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
@@ -104,18 +109,24 @@ Rectangle {
                     }
                 }
 
-                // calender widget
                 Calendar.CalendarWidget {
+                    id: calendarWidget
                     Layout.preferredWidth: 350
                     Layout.preferredHeight: 350
-                    highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
-                    notes: {
-                        "2025-10-15": "Leg day",
-                        "2025-10-20": "Cardio",
-                        "2025-10-25": "Break"
+
+                    noteData: root.calendarNoteData
+
+                    onDateClicked: function(date, existingNote, existingColor) {
+                        console.log("Date selected:", date)
+                        console.log("Existing note:", existingNote)
+                        console.log("Existing color:", existingColor)
+
+                        notePopup.show(date, existingNote, existingColor)
                     }
-                    onDateClicked: function(date) {
-                        console.log("date selected:", date)
+
+                    onNoteUpdated: function(noteDate, text, color) {
+                        console.log("Note updated:", noteDate, text, color)
+                        // TODO: DatabaseManager.saveCalendarNote(...)
                     }
                 }
 
@@ -131,7 +142,7 @@ Rectangle {
                     pressedColor: root.pressedBlue
 
                     onClicked: {
-                    	addExercisePopup.show()
+                        addExercisePopup.show()
                         console.log("Add exercise clicked")
                     }
                 }
@@ -283,12 +294,12 @@ Rectangle {
             id: exerciseListComponent
             anchors.fill: parent
             userId: root.currentUserId
-            
+
             onEditExercise: function(exerciseId) {
                 console.log("Edit exercise:", exerciseId)
                 // TODO: Implement exercise edition
             }
-            
+
             onDeleteExercise: function(exerciseId) {
                 console.log("Delete exercise:", exerciseId)
                 DatabaseManager.deleteExercise(exerciseId)
@@ -394,13 +405,13 @@ Rectangle {
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
             console.log("Adding exercise for userId:", root.currentUserId)
             console.log("data:", name, reps, series, weight, grip, notes)
-            
+
             // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
                 console.error("Error: userId no valid:", root.currentUserId)
                 return
             }
-            
+
             // Call DatabaseManager to save the exercise
             DatabaseManager.addExercise(
                 root.currentUserId,
@@ -416,5 +427,44 @@ Rectangle {
         onCancelled: {
             console.log("Exercise creation cancelled")
         }
+    }
+
+    // Pop-up to add/edit calendar notes
+    Calendar.NotePopUp {
+        id: notePopup
+        anchors.fill: parent
+
+        onNoteSaved: function(noteDate, text, color) {
+            console.log("Saving note:", noteDate, text, color)
+
+            var dateStr = getDateString(noteDate)
+            var newNoteData = Object.assign({}, root.calendarNoteData)
+
+            if (text.trim() === "") {
+                delete newNoteData[dateStr]
+            }
+            else {
+                newNoteData[dateStr] = {
+                    text: text,
+                    color: color
+                }
+            }
+
+            root.calendarNoteData = newNoteData
+
+            // TODO: sava in database
+            // DatabaseManager.saveCalendarNote(root.currentUserId, dateStr, text, color)
+        }
+
+        onCancelled: {
+            console.log("Note creation cancelled")
+        }
+    }
+
+    function getDateString(date) {
+        var year = date.getFullYear()
+        var month = (date.getMonth() + 1).toString().padStart(2, '0')
+        var day = date.getDate().toString().padStart(2, '0')
+        return year + "-" + month + "-" + day
     }
 }
