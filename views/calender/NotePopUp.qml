@@ -4,8 +4,9 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: root
+    anchors.fill: parent
+    color: Qt.rgba(0, 0, 0, 0.7)
     visible: false
-    color: "transparent"
     z: 1000
 
     property date selectedDate: new Date()
@@ -30,75 +31,35 @@ Rectangle {
     signal noteSaved(date noteDate, string text, string color)
     signal cancelled()
 
-    function show(date, existingNote, existingColor) {
-        selectedDate = date
-        currentNote = existingNote || ""
-        currentColor = existingColor || "#1E90FF"
-
-        noteInput.text = currentNote
-        root.visible = true
-    }
-
-    function hide() {
-        root.visible = false
-        noteInput.text = ""
-        currentNote = ""
-        currentColor = "#1E90FF"
-    }
-
+    // Close pop-up when clicking outside
     MouseArea {
         anchors.fill: parent
-        onClicked: {}
+        onClicked: root.visible = false
     }
 
+    // Main container
     Rectangle {
-        id: popup
-        anchors.centerIn: parent
+        id: notePopup
         width: 400
         height: 450
         radius: 20
-        color: "white"
-        border.color: "#e0e0e0"
-        border.width: 1
+        anchors.centerIn: parent
+        color: "#2a2a2a"
+        border.color: "#6C63FF"
+        border.width: 2
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 25
-            spacing: 20
+            anchors.margins: 30
+            spacing: 15
 
-            // Header
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 10
-
-                Text {
-                    text: "📝"
-                    font.pixelSize: 28
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    text: "Add note"
-                    font.pixelSize: 22
-                    font.weight: Font.Bold
-                    color: "#2c3e50"
-                }
-
-                // close button
-                Text {
-                    text: "✕"
-                    font.pixelSize: 24
-                    color: "#95a5a6"
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.hide()
-                            root.cancelled()
-                        }
-                    }
-                }
+            // Title
+            Text {
+                Layout.alignment: Qt.AlignLeft
+                text: "📝 Add note"
+                color: "#ffffff"
+                font.pixelSize: 24
+                font.weight: Font.Bold
             }
 
             // Date selected
@@ -116,12 +77,7 @@ Rectangle {
                     spacing: 10
 
                     Text {
-                        text: "📅"
-                        font.pixelSize: 20
-                    }
-
-                    Text {
-                        text: formatDate(root.selectedDate)
+                        text: "📅  " + formatDate(root.selectedDate)
                         font.pixelSize: 16
                         font.weight: Font.Medium
                         color: "#2c3e50"
@@ -136,9 +92,9 @@ Rectangle {
 
                 Text {
                     text: "Note:"
+                    color: "#b0b0b0"
                     font.pixelSize: 14
                     font.weight: Font.Medium
-                    color: "#2c3e50"
                 }
 
                 ScrollView {
@@ -155,7 +111,7 @@ Rectangle {
 
                         background: Rectangle {
                             radius: 10
-                            color: "white"
+                            color: "#ffffff"
                             border.color: noteInput.activeFocus ? root.currentColor : "#e0e0e0"
                             border.width: 2
                         }
@@ -172,7 +128,7 @@ Rectangle {
                     text: "Color:"
                     font.pixelSize: 14
                     font.weight: Font.Medium
-                    color: "#2c3e50"
+                    color: "#ffffff"
                 }
 
                 GridLayout {
@@ -238,40 +194,38 @@ Rectangle {
                 }
             }
 
-            // Spacer
-            Item {
-                Layout.fillHeight: true
-            }
-
             // Action button
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 12
+                Layout.topMargin: 10
+                spacing: 15
+
+                Item { Layout.fillWidth: true } // Spacer
 
                 // Cancel button
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 50
                     radius: 12
-                    color: cancelMouseArea.containsMouse ? "#e9ecef" : "#f8f9fa"
-                    border.color: "#dee2e6"
-                    border.width: 1
+                    color: cancelArea.pressed ? "#5a5a5a" :
+                           cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
 
                     Text {
                         anchors.centerIn: parent
                         text: "Cancel"
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
-                        color: "#495057"
+                        color: "#ffffff"
+                        font.pixelSize: 18
+                        font.weight: Font.DemiBold
                     }
 
                     MouseArea {
-                        id: cancelMouseArea
+                        id: cancelArea
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+
                         onClicked: {
-                            root.hide()
+                            root.visible = false
                             root.cancelled()
                         }
                     }
@@ -288,9 +242,9 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "Save"
+                        color: "#ffffff"
                         font.pixelSize: 16
-                        font.weight: Font.Bold
-                        color: "white"
+                        font.weight: Font.DemiBold
                     }
 
                     MouseArea {
@@ -299,15 +253,12 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (noteInput.text.trim() !== "") {
+                            if (noteInput.text.trim() !== "")
+                            {
                                 root.noteSaved(root.selectedDate, noteInput.text.trim(), root.currentColor)
                                 root.hide()
                             }
                         }
-                    }
-
-                    Behavior on color {
-                        ColorAnimation { duration: 150 }
                     }
                 }
             }
@@ -324,5 +275,21 @@ Rectangle {
                date.getDate() + " - " +
                months[date.getMonth()] + " - " +
                date.getFullYear()
+    }
+
+    function show(date, existingNote, existingColor) {
+        selectedDate = date
+        currentNote = existingNote || ""
+        currentColor = existingColor || "#1E90FF"
+
+        noteInput.text = currentNote
+        root.visible = true
+    }
+
+    function hide() {
+        root.visible = false
+        noteInput.text = ""
+        currentNote = ""
+        currentColor = "#1E90FF"
     }
 }
