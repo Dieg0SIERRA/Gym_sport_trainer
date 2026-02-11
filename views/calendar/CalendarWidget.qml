@@ -5,8 +5,12 @@ import QtQuick.Layouts 1.15
 Rectangle {
     id: root
 
-    property var highlightedDates: [] // Array of Highlights dates: ["2025-10-15", "2025-10-20"]
-    property var notes: ({}) // notes: {"2025-10-15": "training", "2025-10-20": "Break"}
+    property var noteData: ({})
+
+    // DEPRECATED: maintain for compatibility
+    property var highlightedDates: []
+    property var notes: ({})
+
     property color highlightColor: "#1E90FF"
     property color todayColor: "#FF6B6B"
     property color backgroundColor: "white"
@@ -15,9 +19,9 @@ Rectangle {
     property int currentMonth: currentDate.getMonth()
     property int currentYear: currentDate.getFullYear()
     property date today: new Date()
-    
-    // Signals
-    signal dateClicked(date clickedDate)
+
+    signal dateClicked(date clickedDate, string existingNote, string existingColor)
+    signal noteUpdated(date noteDate, string text, string color)
 
     color: backgroundColor
     radius: 20
@@ -128,11 +132,14 @@ Rectangle {
                                           currentMonth === today.getMonth() &&
                                           currentYear === today.getFullYear()
                     property string dateString: getDateString(dayNumber)
-                    property bool isHighlighted: highlightedDates.indexOf(dateString) !== -1
-                    property bool hasNote: notes.hasOwnProperty(dateString)
 
+                    property bool hasNote: noteData.hasOwnProperty(dateString)
+                    property string noteText: hasNote ? noteData[dateString].text : ""
+                    property string noteColor: hasNote ? noteData[dateString].color : highlightColor
+
+                    //Colour based on custom noteColour
                     color: isToday ? todayColor :
-                           isHighlighted ? highlightColor :
+                           hasNote ? noteColor :
                            "transparent"
                     radius: 10
                     opacity: isCurrentMonth ? 1.0 : 0.3
@@ -141,20 +148,20 @@ Rectangle {
                         anchors.centerIn: parent
                         text: dayNumber > 0 ? dayNumber : ""
                         font.pixelSize: 24
-                        color: (parent.isToday || parent.isHighlighted) ? "white" : "#2c3e50"
+                        color: (parent.isToday || parent.hasNote) ? "white" : "#2c3e50"
                         font.weight: parent.isToday ? Font.Bold : Font.Normal
                     }
 
-                    // Note indicator
+                    // Note indicator - use noteColor
                     Rectangle {
                         width: 8
                         height: 8
                         radius: 4
-                        color: parent.isToday || parent.isHighlighted ? "white" : highlightColor
+                        color: parent.isToday ? "white" : parent.noteColor
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 2
                         anchors.horizontalCenter: parent.horizontalCenter
-                        visible: parent.hasNote && parent.isCurrentMonth
+                        visible: parent.hasNote && parent.isCurrentMonth && !parent.isToday
                     }
 
                     MouseArea {
@@ -165,7 +172,8 @@ Rectangle {
 
                         onPositionChanged: (mouse) => {
                             if (parent.hasNote) {
-                                tooltip.text = notes[parent.dateString]
+                                tooltip.text = parent.noteText
+                                tooltip.backgroundColor = parent.noteColor
                                 tooltip.x = mouse.x + parent.x + 10
                                 tooltip.y = mouse.y + parent.y - tooltip.height - 10
                                 tooltip.visible = true
@@ -175,9 +183,10 @@ Rectangle {
                         onExited: tooltip.visible = false
 
                         onClicked: {
-                            if (parent.isCurrentMonth) {
+                            if (parent.isCurrentMonth)
+                            {
                                 var clickedDate = new Date(currentYear, currentMonth, parent.dayNumber)
-                                dateClicked(clickedDate)
+                                dateClicked(clickedDate, parent.noteText, parent.noteColor)
                             }
                         }
                     }
@@ -186,38 +195,58 @@ Rectangle {
         }
     }
 
-    // Tooltip for notes
+    // Tooltip for notes - dynamic color
     Rectangle {
         id: tooltip
         visible: false
         width: tooltipText.width + 20
         height: tooltipText.height + 16
-        color: "#3bd1c7"
         radius: 10
         z: 100
 
         property alias text: tooltipText.text
+        property color backgroundColor: "#3bd1c7"
+
+        color: backgroundColor
 
         Text {
             id: tooltipText
             anchors.centerIn: parent
             color: "white"
             font.family: "Comic Sans MS"
-            font.weight: Font.italic
+            font.weight: Font.DemiBold
             font.pixelSize: 30
             padding: 4
         }
     }
 
+    function setNote(date, text, color)
+    {
+        var dateStr = getDateStringFromDate(date)
+
+        var newNoteData = Object.assign({}, noteData)
+
+        if (text.trim() === "") {
+            delete newNoteData[dateStr]
+        }
+        else {
+            newNoteData[dateStr] = { text: text,  color: color }
+        }
+
+        noteData = newNoteData
+        updateCalendar()
+        noteUpdated(date, text, color)      // Emit signal
+    }
+
     function getMonthName(month) {
-        var months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
-                     "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         return months[month]
     }
 
     function getDayNumber(index) {
         var firstDay = new Date(currentYear, currentMonth, 1).getDay()
-        firstDay = (firstDay === 0) ? 6 : firstDay - 1 // Ajustar para que lunes sea 0
+        firstDay = (firstDay === 0) ? 6 : firstDay - 1 // Set monday as index 0
 
         var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
         var dayNum = index - firstDay + 1
@@ -235,8 +264,14 @@ Rectangle {
         return currentYear + "-" + month + "-" + day
     }
 
+    function getDateStringFromDate(date) {
+        var year = date.getFullYear()
+        var month = (date.getMonth() + 1).toString().padStart(2, '0')
+        var day = date.getDate().toString().padStart(2, '0')
+        return year + "-" + month + "-" + day
+    }
+
     function updateCalendar() {
-        // Forzar actualización del repeater
         daysRepeater.model = 0
         daysRepeater.model = 42
     }
