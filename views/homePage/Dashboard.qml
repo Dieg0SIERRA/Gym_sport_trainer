@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import "../calendar" as Calendar
 import "../components" as Components
 import "../items_exercise" as ItemsExercise
 
@@ -104,7 +105,7 @@ Rectangle {
                 }
 
                 // calender widget
-                CalendarWidget {
+                Calendar.CalendarWidget {
                     Layout.preferredWidth: 350
                     Layout.preferredHeight: 350
                     highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
@@ -285,7 +286,7 @@ Rectangle {
             
             onEditExercise: function(exerciseId) {
                 console.log("Edit exercise:", exerciseId)
-                // TODO: Implementar edición de ejercicio
+                // TODO: Implement exercise edition
             }
             
             onDeleteExercise: function(exerciseId) {
@@ -396,7 +397,7 @@ Rectangle {
             
             // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
-                console.error("Error: userId no válido:", root.currentUserId)
+                console.error("Error: userId no valid:", root.currentUserId)
                 return
             }
             
