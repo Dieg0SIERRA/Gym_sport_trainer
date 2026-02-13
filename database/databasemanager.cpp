@@ -201,6 +201,29 @@ bool DatabaseManager::createTables()
         qWarning() << "Error during creating exercise table:" << query.lastError().text();
         return false;
     }
+
+    // Creating calendar notes table
+    QString createCalendarNotesTable = R"(
+        CREATE TABLE IF NOT EXISTS calendar_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            note_date TEXT NOT NULL,
+            note_text TEXT NOT NULL,
+            note_color TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(user_id, note_date)
+        )
+    )";
+
+    if (!query.exec(createCalendarNotesTable)) {
+        qWarning() << "Error during creating calendar notes table:" << query.lastError().text();
+        return false;
+    }
+
+    qDebug() << "Tabla 'calendar_notes' verificada/creada exitosamente";
+    
     return true;
 }
 
@@ -347,5 +370,98 @@ bool DatabaseManager::updateExercise(int exerciseId, const QString &name, const 
     }
 
     emit exerciseUpdated(false, "Ejercicio no encontrado");
+    return false;
+}
+
+// ========== Functions for Calendar Notes ==========
+
+bool DatabaseManager::saveCalendarNote(int userId, const QString &date,
+                                       const QString &text, const QString &color)
+{
+    if (date.trimmed().isEmpty() || text.trimmed().isEmpty() || color.trimmed().isEmpty()) {
+        emit calendarNoteSaved(false, "Date, text and color are mandatory");
+        return false;
+    }
+
+    QSqlQuery query(m_database);
+
+    // Try updating first, if it exists
+    query.prepare(R"(
+        INSERT INTO calendar_notes (user_id, note_date, note_text, note_color, updated_at)
+        VALUES (:user_id, :date, :text, :color, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, note_date)
+        DO UPDATE SET
+            note_text = :text,
+            note_color = :color,
+            updated_at = CURRENT_TIMESTAMP
+    )");
+
+    query.bindValue(":user_id", userId);
+    query.bindValue(":date", date);
+    query.bindValue(":text", text);
+    query.bindValue(":color", color);
+
+    if (!query.exec()) {
+        qWarning() << "Error during saving calendar note:" << query.lastError().text();
+        emit calendarNoteSaved(false, "Error during saving calendar note");
+        return false;
+    }
+
+    qDebug() << "Calendar nota saved successfully:" << date << "for user_id:" << userId;
+    emit calendarNoteSaved(true, "calendar nota saved successfully");
+    return true;
+}
+
+QVariantMap DatabaseManager::getCalendarNotesByUser(int userId)
+{
+    QVariantMap notes;
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        SELECT note_date, note_text, note_color
+        FROM calendar_notes
+        WHERE user_id = :user_id
+        ORDER BY note_date ASC
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (!query.exec()) {
+        qWarning() << "Error when getting the calendar notes:" << query.lastError().text();
+        return notes;
+    }
+
+    while (query.next()) {
+        QString date = query.value(0).toString();
+        QVariantMap noteData;
+        noteData["text"] = query.value(1).toString();
+        noteData["color"] = query.value(2).toString();
+
+        notes[date] = noteData;
+    }
+
+    qDebug() << "Calendar notes obtained :" << notes.size() << "for user_id:" << userId;
+    return notes;
+}
+
+bool DatabaseManager::deleteCalendarNote(int userId, const QString &date)
+{
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM calendar_notes WHERE user_id = :user_id AND note_date = :date");
+    query.bindValue(":user_id", userId);
+    query.bindValue(":date", date);
+
+    if (!query.exec()) {
+        qWarning() << "Error when removing calendar note:" << query.lastError().text();
+        emit calendarNoteDeleted(false, "Error when removing calendar note");
+        return false;
+    }
+
+    if (query.numRowsAffected() > 0) {
+        qDebug() << "Calendar note removed successfully, date:" << date;
+        emit calendarNoteDeleted(true, "calendar note removed successfully");
+        return true;
+    }
+
+    emit calendarNoteDeleted(false, "Calendar note no found");
     return false;
 }

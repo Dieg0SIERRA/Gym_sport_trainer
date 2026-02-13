@@ -27,6 +27,11 @@ public:
     Q_INVOKABLE bool updateExercise(int exerciseId, const QString &name, const QString &repetitions, 
                                      int series, double weight, const QString &grip, const QString &notes);
 
+    // Methods callable from QML - Calendar Notes
+    Q_INVOKABLE bool saveCalendarNote(int userId, const QString &date, const QString &text, const QString &color);
+    Q_INVOKABLE QVariantMap getCalendarNotesByUser(int userId);
+    Q_INVOKABLE bool deleteCalendarNote(int userId, const QString &date);
+
 signals:
     // Signals to notify QML - users
     void userCreated(bool success, const QString &message);
@@ -36,6 +41,10 @@ signals:
     void exerciseAdded(bool success, const QString &message);
     void exerciseDeleted(bool success, const QString &message);
     void exerciseUpdated(bool success, const QString &message);
+
+    // Signals to notify QML - Calendar Notes
+    void calendarNoteSaved(bool success, const QString &message);
+    void calendarNoteDeleted(bool success, const QString &message);
 
 private:
     QSqlDatabase m_database;
