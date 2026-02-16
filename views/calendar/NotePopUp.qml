@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import "../components" as Components
 
 Rectangle {
     id: root
@@ -203,61 +204,36 @@ Rectangle {
                 Item { Layout.fillWidth: true } // Spacer
 
                 // Cancel button
-                Rectangle {
+                Components.GenericButton {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 50
-                    radius: 12
-                    color: cancelArea.pressed ? "#5a5a5a" :
-                           cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Cancel"
-                        color: "#ffffff"
-                        font.pixelSize: 18
-                        font.weight: Font.DemiBold
-                    }
-
-                    MouseArea {
-                        id: cancelArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-
-                        onClicked: {
-                            root.visible = false
-                            root.cancelled()
-                        }
+                    buttonRadius: 12; fontSize: 16;
+                    normalColor: "#3a3a3a"
+                    hoverColor: "#4a4a4a"
+                    pressedColor: "#5a5a5a"
+                    text: "cancel"
+                    onClicked: {
+                        root.visible = false
+                        root.cancelled()
                     }
                 }
 
                 // Save button
-                Rectangle {
+                Components.GenericButton {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 50
-                    radius: 12
-                    color: saveMouseArea.pressed ? "#0066CC" :
-                           (saveMouseArea.containsMouse ? "#4169E1" : root.currentColor)
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Save"
-                        color: "#ffffff"
-                        font.pixelSize: 16
-                        font.weight: Font.DemiBold
-                    }
-
-                    MouseArea {
-                        id: saveMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (noteInput.text.trim() !== "")
-                            {
-                                root.noteSaved(root.selectedDate, noteInput.text.trim(), root.currentColor)
-                                root.hide()
-                            }
+                    buttonRadius: 12; fontSize: 16;
+                    normalColor: root.currentColor
+                    hoverColor: "#4169E1"
+                    pressedColor: "#0066CC"
+                    text: "Save"
+                    onClicked: {
+                        if (noteInput.text.trim() !== "")
+                        {
+                            root.noteSaved(root.selectedDate, noteInput.text.trim(), root.currentColor)
+                            root.hide()
                         }
                     }
                 }
