@@ -11,12 +11,13 @@ Rectangle {
 
     property string currentSection: "home"
     property int currentUserId: 1  // ID of the currently logged-in user
+    property var calendarNoteData: ({})
 
-    property var calendarNoteData: ({
-        "2025-02-15": {text: "Leg day", color: "#FF6B6B"},
-        "2025-02-20": {text: "Cardio", color: "#4ECDC4"},
-        "2025-02-25": {text: "Break", color: "#F7DC6F"}
-    })
+    // property var calendarNoteData: ({
+    //     "2025-02-15": {text: "Leg day", color: "#FF6B6B"},
+    //     "2025-02-20": {text: "Cardio", color: "#4ECDC4"},
+    //     "2025-02-25": {text: "Break", color: "#F7DC6F"}
+    // })
 
     readonly property color primaryBlue: "#1E90FF"
     readonly property color hoverBlue: "#4169E1"
@@ -77,6 +78,25 @@ Rectangle {
                 console.log("Error when updating exercise:", message)
             }
         }
+
+        function onCalendarNoteSaved(success, message) {
+            if (success) {
+                console.log("? Note saved successfully")
+                loadCalendarNotes()
+            } else {
+                console.log("? Error saving note:", message)
+            }
+        }
+
+        // NUEVO: Respuesta al eliminar nota
+        function onCalendarNoteDeleted(success, message) {
+            if (success) {
+                console.log("? Note deleted successfully")
+                loadCalendarNotes()
+            } else {
+                console.log("? Error deleting note:", message)
+            }
+        }
     }
 
     // ===== COMPONENTS OF THE CONTENT =====
@@ -97,7 +117,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add seance"
+                    text: "🏋 + Add seance"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -124,17 +144,14 @@ Rectangle {
                         notePopup.show(date, existingNote, existingColor)
                     }
 
-                    onNoteUpdated: function(noteDate, text, color) {
-                        console.log("Note updated:", noteDate, text, color)
-                        // TODO: DatabaseManager.saveCalendarNote(...)
-                    }
+                    onNoteUpdated: function(noteDate, text, color) {}
                 }
 
                 // Add exercise button
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add exercise"
+                    text: "🏃 + Add exercise"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -165,7 +182,7 @@ Rectangle {
                             spacing: 10
 
                             Text {
-                                text: "??"
+                                text: "🕐"
                                 font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -192,7 +209,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add program"
+                    text: "📋 + Add program"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -222,7 +239,7 @@ Rectangle {
                             spacing: 10
 
                             Text {
-                                text: "??"
+                                text: "🏃"
                                 font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -275,7 +292,7 @@ Rectangle {
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18;
                 Layout.preferredWidth: root.buttonWidth
                 Layout.preferredHeight: root.buttonHeight
-                text: "?? + Add seance"
+                text: "🏋 + Add seance"
                 normalColor: root.primaryBlue
                 hoverColor: root.hoverBlue
                 pressedColor: root.pressedBlue
@@ -333,7 +350,7 @@ Rectangle {
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18;
                 Layout.preferredWidth: root.buttonWidth
                 Layout.preferredHeight: root.buttonHeight
-                text: "?? + Add program"
+                text: "📋 + Add program"
                 normalColor: root.primaryBlue
                 hoverColor: root.hoverBlue
                 pressedColor: root.pressedBlue
@@ -435,30 +452,31 @@ Rectangle {
         anchors.fill: parent
 
         onNoteSaved: function(noteDate, text, color) {
-            console.log("Saving note:", noteDate, text, color)
+                    var dateStr = getDateString(noteDate)
 
-            var dateStr = getDateString(noteDate)
-            var newNoteData = Object.assign({}, root.calendarNoteData)
-
-            if (text.trim() === "") {
-                delete newNoteData[dateStr]
-            }
-            else {
-                newNoteData[dateStr] = {
-                    text: text,
-                    color: color
+                    if (text.trim() === "") {
+                        // Texto vacío = eliminar nota
+                        DatabaseManager.deleteCalendarNote(root.currentUserId, dateStr)
+                    } else {
+                        // Guardar en BD (onCalendarNoteSaved recargará la vista)
+                        DatabaseManager.saveCalendarNote(root.currentUserId, dateStr, text, color)
+                    }
                 }
-            }
-
-            root.calendarNoteData = newNoteData
-
-            // TODO: sava in database
-            // DatabaseManager.saveCalendarNote(root.currentUserId, dateStr, text, color)
-        }
 
         onCancelled: {
             console.log("Note creation cancelled")
         }
+    }
+
+    Component.onCompleted: {
+           loadCalendarNotes()
+       }
+
+    // NUEVA FUNCIÓN: Cargar notas desde BD y actualizar el calendario
+    function loadCalendarNotes() {
+        var notes = DatabaseManager.getCalendarNotesByUser(root.currentUserId)
+        root.calendarNoteData = notes
+        console.log("Calendar notes loaded:", JSON.stringify(notes))
     }
 
     function getDateString(date) {
