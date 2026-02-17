@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import "../calendar" as Calendar
 import "../components" as Components
 import "../items_exercise" as ItemsExercise
 
@@ -10,8 +11,14 @@ Rectangle {
 
     property string currentSection: "home"
     property int currentUserId: 1  // ID of the currently logged-in user
+    property var calendarNoteData: ({})
 
-    // ===== Constants for graphic design =====
+    // property var calendarNoteData: ({
+    //     "2025-02-15": {text: "Leg day", color: "#FF6B6B"},
+    //     "2025-02-20": {text: "Cardio", color: "#4ECDC4"},
+    //     "2025-02-25": {text: "Break", color: "#F7DC6F"}
+    // })
+
     readonly property color primaryBlue: "#1E90FF"
     readonly property color hoverBlue: "#4169E1"
     readonly property color pressedBlue: "#0066CC"
@@ -38,7 +45,7 @@ Rectangle {
 
         function onExerciseAdded(success, message) {
             if (success) {
-                console.log("Ejercicio agregado exitosamente")
+                console.log("Exercise added successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
@@ -50,7 +57,7 @@ Rectangle {
 
         function onExerciseDeleted(success, message) {
             if (success) {
-                console.log("Ejercicio eliminado exitosamente")
+                console.log("Exercise deleted successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
@@ -62,13 +69,32 @@ Rectangle {
 
         function onExerciseUpdated(success, message) {
             if (success) {
-                console.log("Ejercicio actualizado exitosamente")
+                console.log("Exercise updated successfully")
                 // Re-loading the exercise list
                 if (contentLoader.item && contentLoader.item.refresh) {
                     contentLoader.item.refresh()
                 }
             } else {
                 console.log("Error when updating exercise:", message)
+            }
+        }
+
+        function onCalendarNoteSaved(success, message) {
+            if (success) {
+                console.log("? Note saved successfully")
+                loadCalendarNotes()
+            } else {
+                console.log("? Error saving note:", message)
+            }
+        }
+
+        // NUEVO: Respuesta al eliminar nota
+        function onCalendarNoteDeleted(success, message) {
+            if (success) {
+                console.log("? Note deleted successfully")
+                loadCalendarNotes()
+            } else {
+                console.log("? Error deleting note:", message)
             }
         }
     }
@@ -91,7 +117,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add seance"
+                    text: "🏋 + Add seance"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -103,26 +129,29 @@ Rectangle {
                     }
                 }
 
-                // calender widget
-                CalendarWidget {
+                Calendar.CalendarWidget {
+                    id: calendarWidget
                     Layout.preferredWidth: 350
                     Layout.preferredHeight: 350
-                    highlightedDates: ["2025-10-15", "2025-10-20", "2025-10-25"]
-                    notes: {
-                        "2025-10-15": "Leg day",
-                        "2025-10-20": "Cardio",
-                        "2025-10-25": "Break"
+
+                    noteData: root.calendarNoteData
+
+                    onDateClicked: function(date, existingNote, existingColor) {
+                        console.log("Date selected:", date)
+                        console.log("Existing note:", existingNote)
+                        console.log("Existing color:", existingColor)
+
+                        notePopup.show(date, existingNote, existingColor)
                     }
-                    onDateClicked: function(date) {
-                        console.log("date selected:", date)
-                    }
+
+                    onNoteUpdated: function(noteDate, text, color) {}
                 }
 
                 // Add exercise button
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add exercise"
+                    text: "🏃 + Add exercise"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -130,7 +159,7 @@ Rectangle {
                     pressedColor: root.pressedBlue
 
                     onClicked: {
-                    	addExercisePopup.show()
+                        addExercisePopup.show()
                         console.log("Add exercise clicked")
                     }
                 }
@@ -153,7 +182,7 @@ Rectangle {
                             spacing: 10
 
                             Text {
-                                text: "??"
+                                text: "🕐"
                                 font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -180,7 +209,7 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
-                    text: "?? + Add program"
+                    text: "📋 + Add program"
                     fontSize: root.buttonFontSize
                     buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
@@ -210,7 +239,7 @@ Rectangle {
                             spacing: 10
 
                             Text {
-                                text: "??"
+                                text: "🏃"
                                 font.pixelSize: root.cardEmojiSize
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -263,7 +292,7 @@ Rectangle {
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18;
                 Layout.preferredWidth: root.buttonWidth
                 Layout.preferredHeight: root.buttonHeight
-                text: "?? + Add seance"
+                text: "🏋 + Add seance"
                 normalColor: root.primaryBlue
                 hoverColor: root.hoverBlue
                 pressedColor: root.pressedBlue
@@ -282,12 +311,12 @@ Rectangle {
             id: exerciseListComponent
             anchors.fill: parent
             userId: root.currentUserId
-            
+
             onEditExercise: function(exerciseId) {
                 console.log("Edit exercise:", exerciseId)
-                // TODO: Implementar edici�n de ejercicio
+                // TODO: Implement exercise edition
             }
-            
+
             onDeleteExercise: function(exerciseId) {
                 console.log("Delete exercise:", exerciseId)
                 DatabaseManager.deleteExercise(exerciseId)
@@ -321,7 +350,7 @@ Rectangle {
                 width: 200; height: 50; buttonRadius: 14; fontSize: 18;
                 Layout.preferredWidth: root.buttonWidth
                 Layout.preferredHeight: root.buttonHeight
-                text: "?? + Add program"
+                text: "📋 + Add program"
                 normalColor: root.primaryBlue
                 hoverColor: root.hoverBlue
                 pressedColor: root.pressedBlue
@@ -393,13 +422,13 @@ Rectangle {
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
             console.log("Adding exercise for userId:", root.currentUserId)
             console.log("data:", name, reps, series, weight, grip, notes)
-            
+
             // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
-                console.error("Error: userId no v�lido:", root.currentUserId)
+                console.error("Error: userId no valid:", root.currentUserId)
                 return
             }
-            
+
             // Call DatabaseManager to save the exercise
             DatabaseManager.addExercise(
                 root.currentUserId,
@@ -415,5 +444,45 @@ Rectangle {
         onCancelled: {
             console.log("Exercise creation cancelled")
         }
+    }
+
+    // Pop-up to add/edit calendar notes
+    Calendar.NotePopUp {
+        id: notePopup
+        anchors.fill: parent
+
+        onNoteSaved: function(noteDate, text, color) {
+                    var dateStr = getDateString(noteDate)
+
+                    if (text.trim() === "") {
+                        // Texto vacío = eliminar nota
+                        DatabaseManager.deleteCalendarNote(root.currentUserId, dateStr)
+                    } else {
+                        // Guardar en BD (onCalendarNoteSaved recargará la vista)
+                        DatabaseManager.saveCalendarNote(root.currentUserId, dateStr, text, color)
+                    }
+                }
+
+        onCancelled: {
+            console.log("Note creation cancelled")
+        }
+    }
+
+    Component.onCompleted: {
+           loadCalendarNotes()
+       }
+
+    // NUEVA FUNCIÓN: Cargar notas desde BD y actualizar el calendario
+    function loadCalendarNotes() {
+        var notes = DatabaseManager.getCalendarNotesByUser(root.currentUserId)
+        root.calendarNoteData = notes
+        console.log("Calendar notes loaded:", JSON.stringify(notes))
+    }
+
+    function getDateString(date) {
+        var year = date.getFullYear()
+        var month = (date.getMonth() + 1).toString().padStart(2, '0')
+        var day = date.getDate().toString().padStart(2, '0')
+        return year + "-" + month + "-" + day
     }
 }
