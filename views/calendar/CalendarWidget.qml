@@ -6,11 +6,6 @@ Rectangle {
     id: root
 
     property var noteData: ({})
-
-    // DEPRECATED: maintain for compatibility
-    property var highlightedDates: []
-    property var notes: ({})
-
     property color highlightColor: "#1E90FF"
     property color todayColor: "#FF6B6B"
     property color backgroundColor: "white"
@@ -199,8 +194,8 @@ Rectangle {
     Rectangle {
         id: tooltip
         visible: false
-        width: tooltipText.width + 20
-        height: tooltipText.height + 16
+        width: tooltipText.width + 10
+        height: tooltipText.height
         radius: 10
         z: 100
 
@@ -215,7 +210,7 @@ Rectangle {
             color: "white"
             font.family: "Comic Sans MS"
             font.weight: Font.DemiBold
-            font.pixelSize: 30
+            font.pixelSize: 18
             padding: 4
         }
     }
