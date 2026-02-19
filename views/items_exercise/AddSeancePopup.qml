@@ -9,8 +9,13 @@ Rectangle {
     visible: false
     z: 1000
 
-    signal seanceAdded(string name, string warmUp, string notes)
+    signal seanceAdded(string name, var exercises, string warmUp, string notes)
     signal cancelled()
+
+    ListModel {
+        id: exercisesModel
+        ListElement { name: "" }
+    }
 
     // Close pop-up when clicking outside
     MouseArea {
@@ -65,9 +70,9 @@ Rectangle {
                 rowSpacing: 15
                 columnSpacing: 15
 
-                // Exercise Name
+                // Seance Name
                 Text {
-                    text: "Exercise Name"
+                    text: "Seance Name"
                     color: "#b0b0b0"
                     font.pixelSize: 14
                     font.weight: Font.Medium
@@ -82,10 +87,10 @@ Rectangle {
                     border.color: exerciseNameField.activeFocus ? "#6C63FF" : "#404040"
 
                     TextField {
-                        id: exerciseNameField
+                        id: seanceNameField
                         anchors.fill: parent
                         anchors.margins: 10
-                        placeholderText: "e.g., Bench Press"
+                        placeholderText: "e.g., Push seance"
                         placeholderTextColor: "#666666"
                         color: "#ffffff"
                         background: Item {}
@@ -115,7 +120,7 @@ Rectangle {
                         anchors.fill: parent
                         anchors.margins: 1
 
-                        model: ["Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
+                        model: ["-------", "Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
 
                         background: Rectangle {
                             color: warmUpExercise.pressed ? "#3a3a3a" : "#1a1a1a"
@@ -173,6 +178,104 @@ Rectangle {
                                 color: parent.highlighted ? "#6C63FF" : "#2a2a2a"
                                 opacity: parent.highlighted ? 0.8 : 1.0
                             }
+                        }
+                    }
+                }
+
+                // Exercise Name
+                Text {
+                    Layout.columnSpan: 2
+                    text: "Exercises"
+                    color: "#b0b0b0"
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                }
+
+                ColumnLayout {
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+                    spacing: 10
+
+                    Repeater {
+                        model: exercisesModel
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 45
+                                color: "#1a1a1a"
+                                radius: 8
+                                border.width: exerciseField.activeFocus ? 2 : 1
+                                border.color: exerciseField.activeFocus ? "#6C63FF" : "#404040"
+
+                                TextField {
+                                    id: exerciseField
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    placeholderText: "e.g., Bench Press"
+                                    placeholderTextColor: "#666666"
+                                    color: "#ffffff"
+                                    background: Item {}
+                                    font.pixelSize: 14
+                                    selectByMouse: true
+
+                                    text: name
+                                    onTextChanged: exercisesModel.setProperty(index, "name", text)
+                                }
+                            }
+
+                            Rectangle {
+                                Layout.preferredWidth: 40
+                                Layout.preferredHeight: 45
+                                radius: 8
+                                color: removeArea.pressed ? "#5a5a5a" :
+                                       removeArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
+                                opacity: exercisesModel.count > 1 ? 1.0 : 0.5
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "−"
+                                    color: "#ffffff"
+                                    font.pixelSize: 20
+                                    font.weight: Font.DemiBold
+                                }
+
+                                MouseArea {
+                                    id: removeArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: exercisesModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    enabled: exercisesModel.count > 1
+                                    onClicked: exercisesModel.remove(index)
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.preferredWidth: 160
+                        Layout.preferredHeight: 40
+                        radius: 10
+                        color: addExerciseArea.pressed ? "#5A52E8" :
+                               addExerciseArea.containsMouse ? "#7B73FF" : "#6C63FF"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "+ Add exercise"
+                            color: "#ffffff"
+                            font.pixelSize: 14
+                            font.weight: Font.DemiBold
+                        }
+
+                        MouseArea {
+                            id: addExerciseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: exercisesModel.append({ "name": "" })
                         }
                     }
                 }
@@ -283,7 +386,8 @@ Rectangle {
                         onClicked: {
                             if (isFormValid()) {
                                 root.seanceAdded(
-                                    exerciseNameField.text,
+                                    seanceNameField,
+                                    getExercises(),
                                     warmUpExercise.currentText,
                                     notesArea.text
                                 )
@@ -297,12 +401,25 @@ Rectangle {
         }
     }
 
+    function getExercises() {
+        var list = []
+        for (var i = 0; i < exercisesModel.count; i++) {
+            var name = (exercisesModel.get(i).name || "").trim()
+            if (name !== "")
+                list.push(name)
+        }
+        return list
+    }
+
     function isFormValid() {
-        return exerciseNameField.text.trim() !== ""
+        var hasExercises = getExercises().length > 0
+        var hasValidWarmUp = warmUpExercise.currentIndex > 0
+        return hasExercises && hasValidWarmUp
     }
 
     function clearFields() {
-        exerciseNameField.text = ""
+        exercisesModel.clear()
+        exercisesModel.append({ "name": "" })
         warmUpExercise.currentIndex = 0
         notesArea.text = ""
     }
