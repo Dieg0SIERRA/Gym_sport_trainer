@@ -28,10 +28,10 @@ public:
                                      int series, double weight, const QString &grip, const QString &notes);
 
     // Methods callable from QML - Seance
-    Q_INVOKABLE bool addSeance(int userId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes);
+    Q_INVOKABLE bool addSeance(int userId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes);
     Q_INVOKABLE QVariantList getSeanceByUser(int userId);
     Q_INVOKABLE bool deleteSeance(int seanceId);
-    Q_INVOKABLE bool updateSeance(int seanceId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes);
+    Q_INVOKABLE bool updateSeance(int seanceId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes);
 
     // Methods callable from QML - Calendar Notes
     Q_INVOKABLE bool saveCalendarNote(int userId, const QString &date, const QString &text, const QString &color);

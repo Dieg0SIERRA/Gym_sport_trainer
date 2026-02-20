@@ -487,14 +487,14 @@ bool DatabaseManager::deleteCalendarNote(int userId, const QString &date)
 
 // ========== Functions for seance actions ==========
 
-bool DatabaseManager::addSeance(int userId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes)
+bool DatabaseManager::addSeance(int userId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes)
 {
     if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
         emit SeanceAdded(false, "The name and list of exercises are mandatory.");
         return false;
     }
 
-    if (warmUp <= 0) {
+    if (warmUp.trimmed().isEmpty()) {
         emit SeanceAdded(false, "The warm-up type is invalid.");
         return false;
     }
@@ -502,7 +502,7 @@ bool DatabaseManager::addSeance(int userId, const QString &name, const QString &
     // Insert Seance
     QSqlQuery query(m_database);
     query.prepare(R"(
-        INSERT INTO seance (user_id, seance_name, exercise_list, warm_up, notes)
+        INSERT INTO seances (user_id, seance_name, exercise_list, warm_up, notes)
         VALUES (:user_id, :name, :exercisesList, :warmUp, :notes)
     )");
 
@@ -546,9 +546,9 @@ QVariantList DatabaseManager::getSeanceByUser(int userId)
         seance["id"] = query.value(0).toInt();
         seance["name"] = query.value(1).toString();
         seance["exerciselist"] = query.value(2).toString();
-        seance["warmup"] = query.value(5).toString();
-        seance["notes"] = query.value(6).toString();
-        seance["created_at"] = query.value(7).toString();
+        seance["warmup"] = query.value(3).toString();
+        seance["notes"] = query.value(4).toString();
+        seance["created_at"] = query.value(5).toString();
 
         seances.append(seance);
     }
@@ -579,16 +579,16 @@ bool DatabaseManager::deleteSeance(int seanceId)
     return false;
 }
 
-bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes)
+bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes)
 {
 
     if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
-        emit exerciseAdded(false, "The name and list of exercises are mandatory.");
+        emit SeanceUpdated(false, "The name and list of exercises are mandatory.");
         return false;
     }
 
-    if (warmUp <= 0) {
-        emit exerciseAdded(false, "The warm-up type is invalid.");
+    if (warmUp.trimmed().isEmpty()) {
+        emit SeanceUpdated(false, "The warm-up type is invalid.");
         return false;
     }
 
@@ -600,7 +600,7 @@ bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QStr
         WHERE id = :id
     )");
 
-    // query.bindValue(":user_id", seanceId);
+    query.bindValue(":user_id", seanceId);
     query.bindValue(":name", name);
     query.bindValue(":exercisesList", exercisesList);
     query.bindValue(":warmUp", warmUp);

@@ -386,8 +386,8 @@ Rectangle {
                         onClicked: {
                             if (isFormValid()) {
                                 root.seanceAdded(
-                                    seanceNameField,
-                                    getExercises(),
+                                    seanceNameField.text,
+                                    getExercises().join(", "),
                                     warmUpExercise.currentText,
                                     notesArea.text
                                 )
@@ -412,9 +412,10 @@ Rectangle {
     }
 
     function isFormValid() {
+        var hasName = seanceNameField.text.trim() !== ""
         var hasExercises = getExercises().length > 0
         var hasValidWarmUp = warmUpExercise.currentIndex > 0
-        return hasExercises && hasValidWarmUp
+        return hasName && hasExercises && hasValidWarmUp
     }
 
     function clearFields() {
