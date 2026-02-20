@@ -1,9 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import "../calendar" as Calendar
 import "../components" as Components
 import "../items_exercise" as ItemsExercise
+import "../calendar" as Calendar
 
 Rectangle {
     id: root
@@ -81,20 +81,20 @@ Rectangle {
 
         function onCalendarNoteSaved(success, message) {
             if (success) {
-                console.log("? Note saved successfully")
+                console.log("✓ Note saved successfully")
                 loadCalendarNotes()
             } else {
-                console.log("? Error saving note:", message)
+                console.log("✗ Error saving note:", message)
             }
         }
 
         // NUEVO: Respuesta al eliminar nota
         function onCalendarNoteDeleted(success, message) {
             if (success) {
-                console.log("? Note deleted successfully")
+                console.log("✓ Note deleted successfully")
                 loadCalendarNotes()
             } else {
-                console.log("? Error deleting note:", message)
+                console.log("✗ Error deleting note:", message)
             }
         }
     }
@@ -125,6 +125,7 @@ Rectangle {
                     pressedColor: root.pressedBlue
 
                     onClicked: {
+                        addSeancePopup.show()
                         console.log("Add seance clicked")
                     }
                 }
@@ -151,9 +152,8 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
+                    buttonRadius: 8; fontSize: 18;
                     text: "🏃 + Add exercise"
-                    fontSize: root.buttonFontSize
-                    buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
                     hoverColor: root.hoverBlue
                     pressedColor: root.pressedBlue
@@ -298,6 +298,7 @@ Rectangle {
                 pressedColor: root.pressedBlue
 
                 onClicked: {
+                    addSeancePopup.show()
                     console.log("Add seance clicked")
                 }
             }
@@ -439,6 +440,21 @@ Rectangle {
                 grip,
                 notes
             )
+        }
+
+        onCancelled: {
+            console.log("Exercise creation cancelled")
+        }
+    }
+
+    // Pop-up to add seance
+    ItemsExercise.AddSeancePopup {
+        id: addSeancePopup
+        anchors.fill: parent
+
+        onSeanceAdded: function(name, exercises, warmUp, notes) {
+            console.log("Seance added for userId:", root.currentUserId)
+            console.log("data:", name, exercises, warmUp, notes)
         }
 
         onCancelled: {
