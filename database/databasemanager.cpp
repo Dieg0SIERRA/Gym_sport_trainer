@@ -202,6 +202,25 @@ bool DatabaseManager::createTables()
         return false;
     }
 
+    // Creating Seance table
+    QString createSeancesTable = R"(
+        CREATE TABLE IF NOT EXISTS seances (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            seance_name TEXT NOT NULL,
+            exercise_list TEXT NOT NULL,
+            warm_up TEXT NOT NULL,
+            notes TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    )";
+
+    if (!query.exec(createSeancesTable)) {
+        qWarning() << "Error during creating seance table:" << query.lastError().text();
+        return false;
+    }
+
     // Creating calendar notes table
     QString createCalendarNotesTable = R"(
         CREATE TABLE IF NOT EXISTS calendar_notes (
@@ -238,7 +257,7 @@ bool DatabaseManager::addExercise(int userId, const QString &name, const QString
     }
 
     if (series <= 0 || weight < 0) {
-        emit exerciseAdded(false, "Series y peso deben ser valores válidos");
+        emit exerciseAdded(false, "Series y peso deben ser valores vÃ¡lidos");
         return false;
     }
 
@@ -336,7 +355,7 @@ bool DatabaseManager::updateExercise(int exerciseId, const QString &name, const 
     }
 
     if (series <= 0 || weight < 0) {
-        emit exerciseUpdated(false, "Series y peso deben ser valores válidos");
+        emit exerciseUpdated(false, "Series y peso deben ser valores vÃ¡lidos");
         return false;
     }
 
@@ -463,5 +482,142 @@ bool DatabaseManager::deleteCalendarNote(int userId, const QString &date)
     }
 
     emit calendarNoteDeleted(false, "Calendar note no found");
+    return false;
+}
+
+// ========== Functions for seance actions ==========
+
+bool DatabaseManager::addSeance(int userId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes)
+{
+    if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
+        emit SeanceAdded(false, "The name and list of exercises are mandatory.");
+        return false;
+    }
+
+    if (warmUp <= 0) {
+        emit SeanceAdded(false, "The warm-up type is invalid.");
+        return false;
+    }
+
+    // Insert Seance
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        INSERT INTO seance (user_id, seance_name, exercise_list, warm_up, notes)
+        VALUES (:user_id, :name, :exercisesList, :warmUp, :notes)
+    )");
+
+    query.bindValue(":user_id", userId);
+    query.bindValue(":name", name);
+    query.bindValue(":exercisesList", exercisesList);
+    query.bindValue(":warmUp", warmUp);
+    query.bindValue(":notes", notes);
+
+    if (!query.exec()) {
+        qWarning() << "Error to add seance:" << query.lastError().text();
+        emit SeanceAdded(false, "Error to add seance");
+        return false;
+    }
+
+    qDebug() << "Seance successfully added:" << name << "for user_id:" << userId;
+    emit SeanceAdded(true, "Seance successfully added");
+    return true;
+}
+
+QVariantList DatabaseManager::getSeanceByUser(int userId)
+{
+    QVariantList seances;
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        SELECT id, seance_name, exercise_list, warm_up, notes, created_at
+        FROM seances
+        WHERE user_id = :user_id
+        ORDER BY created_at DESC
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (!query.exec()) {
+        qWarning() << "Error to get seance :" << query.lastError().text();
+        return seances;
+    }
+
+    while (query.next()) {
+        QVariantMap seance;
+        seance["id"] = query.value(0).toInt();
+        seance["name"] = query.value(1).toString();
+        seance["exerciselist"] = query.value(2).toString();
+        seance["warmup"] = query.value(5).toString();
+        seance["notes"] = query.value(6).toString();
+        seance["created_at"] = query.value(7).toString();
+
+        seances.append(seance);
+    }
+
+    qDebug() << "Obtained seance:" << seances.size() << "for user_id:" << userId;
+    return seances;
+}
+
+bool DatabaseManager::deleteSeance(int seanceId)
+{
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM seances WHERE id = :id");
+    query.bindValue(":id", seanceId);
+
+    if (!query.exec()) {
+        qWarning() << "Error to remove seance :" << query.lastError().text();
+        emit SeanceDeleted(false, "Error to remove seance");
+        return false;
+    }
+
+    if (query.numRowsAffected() > 0) {
+        qDebug() << "Seance successfully removed, ID:" << seanceId;
+        emit SeanceDeleted(true, "Seance successfully removed");
+        return true;
+    }
+
+    emit SeanceDeleted(false, "seance not found");
+    return false;
+}
+
+bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QString &exercisesList, int warmUp, const QString &notes)
+{
+
+    if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
+        emit exerciseAdded(false, "The name and list of exercises are mandatory.");
+        return false;
+    }
+
+    if (warmUp <= 0) {
+        emit exerciseAdded(false, "The warm-up type is invalid.");
+        return false;
+    }
+
+    // update seance
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        UPDATE seances
+        SET seance_name = :name, exercise_list = :exercisesList, warm_up = :warmUp, notes = :notes
+        WHERE id = :id
+    )");
+
+    // query.bindValue(":user_id", seanceId);
+    query.bindValue(":name", name);
+    query.bindValue(":exercisesList", exercisesList);
+    query.bindValue(":warmUp", warmUp);
+    query.bindValue(":notes", notes);
+
+    if (!query.exec()) {
+        qWarning() << "Error to update seance:" << query.lastError().text();
+        emit SeanceUpdated(false, "Error to update seance");
+        return false;
+    }
+
+    if (query.numRowsAffected() > 0) {
+        qDebug() << "Seance successfully update:" << name << "for user_id:" << seanceId;
+        emit SeanceUpdated(true, "Seance successfully update");
+        return true;
+    }
+
+    emit SeanceUpdated(false, "Seance not found");
     return false;
 }
