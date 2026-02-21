@@ -39,10 +39,11 @@ Rectangle {
     readonly property int cardLabelSize: 16
     readonly property int cardEmojiSize: 32
 
-    // Add connections with DatabaseManager for exercises
+    // Add connections with DatabaseManager
     Connections {
         target: DatabaseManager
 
+        // Signals for Exercises
         function onExerciseAdded(success, message) {
             if (success) {
                 console.log("Exercise added successfully")
@@ -79,6 +80,7 @@ Rectangle {
             }
         }
 
+        // Signals for Calendar notes
         function onCalendarNoteSaved(success, message) {
             if (success) {
                 console.log("✓ Note saved successfully")
@@ -88,13 +90,49 @@ Rectangle {
             }
         }
 
-        // NUEVO: Respuesta al eliminar nota
         function onCalendarNoteDeleted(success, message) {
             if (success) {
                 console.log("✓ Note deleted successfully")
                 loadCalendarNotes()
             } else {
                 console.log("✗ Error deleting note:", message)
+            }
+        }
+
+        // Signals for Seance
+        function onSeanceAdded(success, message) {
+            if (success) {
+                console.log("Seance added successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when adding seance:", message)
+            }
+        }
+
+        function onSeanceDeleted(success, message) {
+            if (success) {
+                console.log("Seance deleted successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when deleting seance:", message)
+            }
+        }
+
+        function onSeanceUpdated(success, message) {
+            if (success) {
+                console.log("Seance updated successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when updating seance:", message)
             }
         }
     }
@@ -455,6 +493,19 @@ Rectangle {
         onSeanceAdded: function(name, exercises, warmUp, notes) {
             console.log("Seance added for userId:", root.currentUserId)
             console.log("data:", name, exercises, warmUp, notes)
+
+            if (root.currentUserId <= 0) {
+                console.error("Error: userId not valid:", root.currentUserId)
+                return
+            }
+
+            DatabaseManager.addSeance(
+                root.currentUserId,
+                name,
+                exercises,
+                warmUp,
+                notes
+            )
         }
 
         onCancelled: {
