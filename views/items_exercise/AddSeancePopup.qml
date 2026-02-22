@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
+import "../components" as Components
+
 Rectangle {
     id: root
     anchors.fill: parent
@@ -71,32 +73,16 @@ Rectangle {
                 columnSpacing: 15
 
                 // Seance Name
-                Text {
-                    text: "Seance Name"
-                    color: "#b0b0b0"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                }
-
-                Rectangle {
+                Components.GenericTextField {
+                    id: seanceNameField
+                    Layout.columnSpan: 2
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 45
-                    color: "#1a1a1a"
-                    radius: 8
-                    border.width: seanceNameField.activeFocus ? 2 : 1
-                    border.color: seanceNameField.activeFocus ? "#6C63FF" : "#404040"
-
-                    TextField {
-                        id: seanceNameField
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        placeholderText: "e.g., Push seance"
-                        placeholderTextColor: "#666666"
-                        color: "#ffffff"
-                        background: Item {}
-                        font.pixelSize: 14
-                        selectByMouse: true
-                    }
+                    labelText: "Seance Name"
+                    placeholderText: "e.g., Push seance"
+                    fieldBackgroundColor: "#1a1a1a"
+                    fieldRadius: 8
+                    fontSize: 14
+                    labelFontSize: 14
                 }
 
                 // Warm-up exercise
@@ -203,28 +189,18 @@ Rectangle {
                             Layout.fillWidth: true
                             spacing: 10
 
-                            Rectangle {
+                            Components.GenericTextField {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 45
-                                color: "#1a1a1a"
-                                radius: 8
-                                border.width: exerciseField.activeFocus ? 2 : 1
-                                border.color: exerciseField.activeFocus ? "#6C63FF" : "#404040"
+                                labelText: ""
+                                placeholderText: "e.g., Bench Press"
+                                fieldBackgroundColor: "#1a1a1a"
+                                fieldRadius: 8
+                                fontSize: 14
+                                labelFontSize: 14
 
-                                TextField {
-                                    id: exerciseField
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    placeholderText: "e.g., Bench Press"
-                                    placeholderTextColor: "#666666"
-                                    color: "#ffffff"
-                                    background: Item {}
-                                    font.pixelSize: 14
-                                    selectByMouse: true
-
-                                    text: name
-                                    onTextChanged: exercisesModel.setProperty(index, "name", text)
-                                }
+                                text: name
+                                onTextChanged: exercisesModel.setProperty(index, "name", text)
                             }
 
                             Rectangle {
