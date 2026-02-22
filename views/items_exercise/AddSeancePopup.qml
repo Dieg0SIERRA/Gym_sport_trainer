@@ -14,6 +14,12 @@ Rectangle {
     signal seanceAdded(string name, var exercises, string warmUp, string notes)
     signal cancelled()
 
+    // ── Edit mode properties ──
+    property bool editMode: false
+    property int editSeanceId: -1
+    signal seanceUpdated(int seanceId, string name, var exercises, string warmUp, string notes)
+
+
     ListModel {
         id: exercisesModel
         ListElement { name: "" }
@@ -50,7 +56,7 @@ Rectangle {
             // Title
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "🏋️ Add New Seance"
+                text: root.editMode ? "✏️ Edit Seance" : "🏋️ Add New Seance"
                 color: "#ffffff"
                 font.pixelSize: 24
                 font.weight: Font.Bold
@@ -346,7 +352,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "Add Seance"
+                        text: root.editMode ? "Save Changes" : "Add Seance"
                         color: "#ffffff"
                         font.pixelSize: 16
                         font.weight: Font.DemiBold
@@ -361,12 +367,23 @@ Rectangle {
 
                         onClicked: {
                             if (isFormValid()) {
-                                root.seanceAdded(
-                                    seanceNameField.text,
-                                    getExercises().join(", "),
-                                    warmUpExercise.currentText,
-                                    notesArea.text
-                                )
+                                if (root.editMode) {
+                                    root.seanceUpdated(
+                                        root.editSeanceId,
+                                        seanceNameField.text,
+                                        getExercises().join(", "),
+                                        warmUpExercise.currentText,
+                                        notesArea.text
+                                    )
+                                }
+                                else {
+                                    root.seanceAdded(
+                                        seanceNameField.text,
+                                        getExercises().join(", "),
+                                        warmUpExercise.currentText,
+                                        notesArea.text
+                                    )
+                                }
                                 clearFields()
                                 root.visible = false
                             }
@@ -395,6 +412,7 @@ Rectangle {
     }
 
     function clearFields() {
+        // seanceNameField.clear()
         exercisesModel.clear()
         exercisesModel.append({ "name": "" })
         warmUpExercise.currentIndex = 0
@@ -403,6 +421,34 @@ Rectangle {
 
     function show() {
         clearFields()
+        root.visible = true
+    }
+
+    function showEdit(seanceId, name, exercises, warmUp, notes) {
+        editMode = true
+        editSeanceId = seanceId
+        clearFields()
+
+        // Pre-fill fields
+        seanceNameField.text = name
+        notesArea.text = notes
+
+        // Set warm-up combo box
+        var warmUpOptions = ["-------", "Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
+        var idx = warmUpOptions.indexOf(warmUp)
+        warmUpExercise.currentIndex = idx >= 0 ? idx : 0
+
+        // Populate exercises
+        exercisesModel.clear()
+        var exerciseArray = exercises.split(",")
+        for (var i = 0; i < exerciseArray.length; i++) {
+            var trimmed = exerciseArray[i].trim()
+            if (trimmed !== "")
+                exercisesModel.append({ "name": trimmed })
+        }
+        if (exercisesModel.count === 0)
+            exercisesModel.append({ "name": "" })
+
         root.visible = true
     }
 }

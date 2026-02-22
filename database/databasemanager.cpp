@@ -600,7 +600,7 @@ bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QStr
         WHERE id = :id
     )");
 
-    query.bindValue(":user_id", seanceId);
+    query.bindValue(":id", seanceId);
     query.bindValue(":name", name);
     query.bindValue(":exercisesList", exercisesList);
     query.bindValue(":warmUp", warmUp);

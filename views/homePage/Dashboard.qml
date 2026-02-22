@@ -313,7 +313,20 @@ Rectangle {
 
             onEditSeance: function(seanceId) {
                 console.log("Edit seance:", seanceId)
-                // TODO: Implement seance edition
+                // Find the seance data and open the popup in edit mode
+                var seances = DatabaseManager.getSeanceByUser(root.currentUserId)
+                for (var i = 0; i < seances.length; i++) {
+                    if (seances[i].id === seanceId) {
+                        addSeancePopup.showEdit(
+                            seances[i].id,
+                            seances[i].name,
+                            seances[i].exerciselist,
+                            seances[i].warmup,
+                            seances[i].notes
+                        )
+                        return
+                    }
+                }
             }
 
             onDeleteSeance: function(seanceId) {
@@ -321,42 +334,6 @@ Rectangle {
                 DatabaseManager.deleteSeance(seanceId)
             }
         }
-
-    //     Column {
-    //         anchors.centerIn: parent
-    //         spacing: 20
-    //
-    //         Text {
-    //             text: "SEANCE"
-    //             font.pixelSize: 32
-    //             font.weight: Font.Bold
-    //             color: "#2c3e50"
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //         }
-    //
-    //         Text {
-    //             text: "Training sessions management"
-    //             font.pixelSize: 16
-    //             color: "#7f8c8d"
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //         }
-    //
-    //         // Add seance button
-    //         Components.GenericButton {
-    //             width: 200; height: 50; buttonRadius: 14; fontSize: 18;
-    //             Layout.preferredWidth: root.buttonWidth
-    //             Layout.preferredHeight: root.buttonHeight
-    //             text: "🏋 + Add seance"
-    //             normalColor: root.primaryBlue
-    //             hoverColor: root.hoverBlue
-    //             pressedColor: root.pressedBlue
-    //
-    //             onClicked: {
-    //                 addSeancePopup.show()
-    //                 console.log("Add seance clicked")
-    //             }
-    //         }
-    //     }
     }
 
     Component {
@@ -487,13 +464,7 @@ Rectangle {
             // Call DatabaseManager to save the exercise
             DatabaseManager.addExercise(
                 root.currentUserId,
-                name,
-                reps,
-                series,
-                weight,
-                grip,
-                notes
-            )
+                name, reps, series, weight, grip, notes )
         }
 
         onCancelled: {
@@ -516,12 +487,15 @@ Rectangle {
             }
 
             DatabaseManager.addSeance(
-                root.currentUserId,
-                name,
-                exercises,
-                warmUp,
-                notes
-            )
+                root.currentUserId, name, exercises, warmUp, notes )
+        }
+
+        onSeanceUpdated: function(seanceId, name, exercises, warmUp, notes) {
+            console.log("Seance edited, id:", seanceId)
+            console.log("data:", name, exercises, warmUp, notes)
+
+            DatabaseManager.updateSeance(
+                seanceId, name, exercises, warmUp, notes )
         }
 
         onCancelled: {
