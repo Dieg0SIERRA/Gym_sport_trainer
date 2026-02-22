@@ -306,41 +306,57 @@ Rectangle {
     Component {
         id: seanceContent
 
-        Column {
-            anchors.centerIn: parent
-            spacing: 20
+        ItemsExercise.SeanceList {
+            id: seanceListComponent
+            anchors.fill: parent
+            userId: root.currentUserId
 
-            Text {
-                text: "SEANCE"
-                font.pixelSize: 32
-                font.weight: Font.Bold
-                color: "#2c3e50"
-                anchors.horizontalCenter: parent.horizontalCenter
+            onEditSeance: function(seanceId) {
+                console.log("Edit seance:", seanceId)
+                // TODO: Implement seance edition
             }
 
-            Text {
-                text: "Training sessions management"
-                font.pixelSize: 16
-                color: "#7f8c8d"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            // Add seance button
-            Components.GenericButton {
-                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
-                Layout.preferredWidth: root.buttonWidth
-                Layout.preferredHeight: root.buttonHeight
-                text: "🏋 + Add seance"
-                normalColor: root.primaryBlue
-                hoverColor: root.hoverBlue
-                pressedColor: root.pressedBlue
-
-                onClicked: {
-                    addSeancePopup.show()
-                    console.log("Add seance clicked")
-                }
+            onDeleteSeance: function(seanceId) {
+                console.log("Delete seance:", seanceId)
+                DatabaseManager.deleteSeance(seanceId)
             }
         }
+
+    //     Column {
+    //         anchors.centerIn: parent
+    //         spacing: 20
+    //
+    //         Text {
+    //             text: "SEANCE"
+    //             font.pixelSize: 32
+    //             font.weight: Font.Bold
+    //             color: "#2c3e50"
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //         }
+    //
+    //         Text {
+    //             text: "Training sessions management"
+    //             font.pixelSize: 16
+    //             color: "#7f8c8d"
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //         }
+    //
+    //         // Add seance button
+    //         Components.GenericButton {
+    //             width: 200; height: 50; buttonRadius: 14; fontSize: 18;
+    //             Layout.preferredWidth: root.buttonWidth
+    //             Layout.preferredHeight: root.buttonHeight
+    //             text: "🏋 + Add seance"
+    //             normalColor: root.primaryBlue
+    //             hoverColor: root.hoverBlue
+    //             pressedColor: root.pressedBlue
+    //
+    //             onClicked: {
+    //                 addSeancePopup.show()
+    //                 console.log("Add seance clicked")
+    //             }
+    //         }
+    //     }
     }
 
     Component {

@@ -83,8 +83,8 @@ Rectangle {
                     Layout.preferredHeight: 45
                     color: "#1a1a1a"
                     radius: 8
-                    border.width: exerciseNameField.activeFocus ? 2 : 1
-                    border.color: exerciseNameField.activeFocus ? "#6C63FF" : "#404040"
+                    border.width: seanceNameField.activeFocus ? 2 : 1
+                    border.color: seanceNameField.activeFocus ? "#6C63FF" : "#404040"
 
                     TextField {
                         id: seanceNameField
