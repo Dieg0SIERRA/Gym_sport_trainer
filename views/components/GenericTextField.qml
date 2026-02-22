@@ -8,6 +8,8 @@ Item {
     property string labelText: "Label"
     property string placeholderText: "Enter text"
     property bool isPassword: false
+    property string iconText: ""
+    property int iconFontSize: 18
     property color labelColor: "#b0b0b0"
     property color focusColor: "#6C63FF"
     property color validColor: "#40a040"
@@ -27,22 +29,17 @@ Item {
     property bool showValidation: false
 
     // exposed properties
-    // readonly property alias text: textField.text
-    // readonly property alias activeFocus: textField.activeFocus
     property string text: textField.text
     readonly property bool fieldHasFocus: textField.activeFocus
 
-    // Signals
-    // signal textChanged()
-
-    // agregar binding inverso para que funcione en ambas direcciones:
+    // Add reverse binding so that it works in both directions:
     onTextChanged: {
         if (textField.text !== text)
             textField.text = text
     }
 
     implicitWidth: 300
-    implicitHeight: 85
+    implicitHeight: root.labelText !== "" ? 85 : 50
 
     // Label
     Text {
@@ -51,15 +48,17 @@ Item {
         color: root.labelColor
         font.pixelSize: root.labelFontSize
         font.weight: Font.Medium
+        visible: root.labelText !== ""
+        height: visible ? implicitHeight : 0
     }
 
     // text field with background
     Rectangle {
         id: fieldBackground
         width: parent.width
-        height: 50
-        anchors.top: label.bottom
-        anchors.topMargin: 8
+        anchors.top: label.visible ? label.bottom : parent.top
+        anchors.topMargin: label.visible ? 8 : 0
+        anchors.bottom: parent.bottom
         color: root.fieldBackgroundColor
         radius: root.fieldRadius
         border.width: textField.activeFocus ? 2 : 1
@@ -69,23 +68,56 @@ Item {
 
         Behavior on border.color { ColorAnimation { duration: 200 } }
 
-        TextField {
-            id: textField
+        Row {
             anchors.fill: parent
-            anchors.margins: 15
-            placeholderText: root.placeholderText
-            placeholderTextColor: root.placeholderColor
-            color: root.textColor
-            background: Item {}
-            font.pixelSize: root.fontSize
-            echoMode: root.isPassword ? TextInput.Password : TextInput.Normal
-            selectByMouse: true
+            anchors.margins: 8
+            spacing: 10
 
-            onTextChanged: {
-                if (root.text !== text)
-                    root.text = text
+            // Optional icon
+            Text {
+                id: iconLabel
+                text: root.iconText
+                font.pixelSize: root.iconFontSize
+                visible: root.iconText !== ""
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            TextField {
+                id: textField
+                width: parent.width - (iconLabel.visible ? iconLabel.width + parent.spacing : 0)
+                height: parent.height
+                placeholderText: root.placeholderText
+                placeholderTextColor: root.placeholderColor
+                color: root.textColor
+                background: Item {}
+                font.pixelSize: root.fontSize
+                echoMode: root.isPassword ? TextInput.Password : TextInput.Normal
+                selectByMouse: true
+
+                onTextChanged: {
+                    if (root.text !== text)
+                        root.text = text
+                }
             }
         }
+
+        // TextField {
+        //     id: textField
+        //     anchors.fill: parent
+        //     anchors.margins: 15
+        //     placeholderText: root.placeholderText
+        //     placeholderTextColor: root.placeholderColor
+        //     color: root.textColor
+        //     background: Item {}
+        //     font.pixelSize: root.fontSize
+        //     echoMode: root.isPassword ? TextInput.Password : TextInput.Normal
+        //     selectByMouse: true
+        //
+        //     onTextChanged: {
+        //         if (root.text !== text)
+        //             root.text = text
+        //     }
+        // }
     }
 
     // Validation message
