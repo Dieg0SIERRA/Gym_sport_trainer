@@ -35,7 +35,7 @@ Rectangle {
     Rectangle {
         id: formContainer
         width: 600
-        height: 550
+        height: Math.min(contentColumn.implicitHeight + 60, parent.height * 0.9)
         anchors.centerIn: parent
         color: "#2a2a2a"
         radius: 20
@@ -49,6 +49,7 @@ Rectangle {
         }
 
         ColumnLayout {
+            id: contentColumn
             anchors.fill: parent
             anchors.margins: 30
             spacing: 15
@@ -186,52 +187,66 @@ Rectangle {
                 ColumnLayout {
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
+                    Layout.maximumHeight: 200
                     spacing: 10
 
-                    Repeater {
-                        model: exercisesModel
+                    ScrollView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
-                        RowLayout {
-                            Layout.fillWidth: true
+                        ColumnLayout {
+                            id: exercisesColumn
+                            width: parent.width
                             spacing: 10
 
-                            Components.GenericTextField {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 45
-                                labelText: ""
-                                placeholderText: "e.g., Bench Press"
-                                fieldBackgroundColor: "#1a1a1a"
-                                fieldRadius: 8
-                                fontSize: 14
-                                labelFontSize: 14
+                            Repeater {
+                                model: exercisesModel
 
-                                text: name
-                                onTextChanged: exercisesModel.setProperty(index, "name", text)
-                            }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 10
 
-                            Rectangle {
-                                Layout.preferredWidth: 40
-                                Layout.preferredHeight: 45
-                                radius: 8
-                                color: removeArea.pressed ? "#5a5a5a" :
-                                       removeArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
-                                opacity: exercisesModel.count > 1 ? 1.0 : 0.5
+                                    Components.GenericTextField {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 45
+                                        labelText: ""
+                                        placeholderText: "e.g., Bench Press"
+                                        fieldBackgroundColor: "#1a1a1a"
+                                        fieldRadius: 8
+                                        fontSize: 14
+                                        labelFontSize: 14
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "−"
-                                    color: "#ffffff"
-                                    font.pixelSize: 20
-                                    font.weight: Font.DemiBold
-                                }
+                                        text: name
+                                        onTextChanged: exercisesModel.setProperty(index, "name", text)
+                                    }
 
-                                MouseArea {
-                                    id: removeArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: exercisesModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    enabled: exercisesModel.count > 1
-                                    onClicked: exercisesModel.remove(index)
+                                    Rectangle {
+                                        Layout.preferredWidth: 40
+                                        Layout.preferredHeight: 45
+                                        radius: 8
+                                        color: removeArea.pressed ? "#5a5a5a" :
+                                            removeArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
+                                        opacity: exercisesModel.count > 1 ? 1.0 : 0.5
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "−"
+                                            color: "#ffffff"
+                                            font.pixelSize: 20
+                                            font.weight: Font.DemiBold
+                                        }
+
+                                        MouseArea {
+                                            id: removeArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: exercisesModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            enabled: exercisesModel.count > 1
+                                            onClicked: exercisesModel.remove(index)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -242,7 +257,7 @@ Rectangle {
                         Layout.preferredHeight: 40
                         radius: 10
                         color: addExerciseArea.pressed ? "#5A52E8" :
-                               addExerciseArea.containsMouse ? "#7B73FF" : "#6C63FF"
+                            addExerciseArea.containsMouse ? "#7B73FF" : "#6C63FF"
 
                         Text {
                             anchors.centerIn: parent
@@ -315,7 +330,7 @@ Rectangle {
                     Layout.preferredWidth: 120
                     Layout.preferredHeight: 45
                     color: cancelArea.pressed ? "#5a5a5a" :
-                           cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
+                        cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
                     radius: 10
 
                     Text {
@@ -345,8 +360,8 @@ Rectangle {
                     Layout.preferredWidth: 150
                     Layout.preferredHeight: 45
                     color: !isFormValid() ? "#404040" :
-                           addArea.pressed ? "#5A52E8" :
-                           addArea.containsMouse ? "#7B73FF" : "#6C63FF"
+                        addArea.pressed ? "#5A52E8" :
+                            addArea.containsMouse ? "#7B73FF" : "#6C63FF"
                     radius: 10
                     opacity: isFormValid() ? 1.0 : 0.6
 
@@ -397,9 +412,9 @@ Rectangle {
     function getExercises() {
         var list = []
         for (var i = 0; i < exercisesModel.count; i++) {
-            var name = (exercisesModel.get(i).name || "").trim()
-            if (name !== "")
-                list.push(name)
+            var exerciseName = (exercisesModel.get(i).name || "").trim()
+            if (exerciseName !== "")
+                list.push(exerciseName)
         }
         return list
     }
