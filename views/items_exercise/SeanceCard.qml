@@ -195,8 +195,9 @@ Rectangle {
                     width: 80; height: 35; fontSize: 13; buttonRadius: 8
                     text: "✏️ Edit"
                     textColor: "white"
-                    color: editArea.pressed ? "#0066CC" :
-                           editArea.containsMouse ? "#4169E1" : "#1E90FF"
+                    normalColor: "#1E90FF"
+                    hoverColor: "#4169E1"
+                    pressedColor: "#0066CC"
 
                     onClicked: {
                         root.editClicked(root.seanceId)
@@ -210,12 +211,12 @@ Rectangle {
                     width: 90; height: 35; fontSize: 13; buttonRadius: 8
                     text: "🗑️ Delete"
                     textColor: "white"
-                    color: deleteArea.pressed ? "#c0392b" :
-                           deleteArea.containsMouse ? "#e74c3c" : "#d04040"
+                    normalColor: "#d04040"
+                    hoverColor: "#e74c3c"
+                    pressedColor: "#c0392b"
 
                     onClicked: {
                         root.deleteClicked(root.seanceId)
-                        mouse.accepted = true
                     }
                 }
             }

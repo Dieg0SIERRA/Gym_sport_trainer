@@ -60,13 +60,9 @@ Rectangle {
                 Layout.alignment: Qt.AlignLeft
                 width: 45; height: 45; fontSize: 20; buttonRadius: 22.5
                 text: "🔄"
-                rotation: refreshArea.pressed ? 180 : 0
-                color: refreshArea.pressed ? "#0066CC" :
-                    refreshArea.containsMouse ? "#4169E1" : "#1E90FF"
-
-                Behavior on rotation {
-                    NumberAnimation { duration: 300 }
-                }
+                normalColor: "#1E90FF"
+                hoverColor: "#4169E1"
+                pressedColor: "#0066CC"
 
                 onClicked: {
                     loadSeances()
