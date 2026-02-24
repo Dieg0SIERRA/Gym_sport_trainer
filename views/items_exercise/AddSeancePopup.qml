@@ -12,6 +12,7 @@ Rectangle {
     z: 1000
 
     signal seanceAdded(string name, var exercises, string warmUp, string notes)
+    signal addExerciseRequested()
     signal cancelled()
 
     // ── Edit mode properties ──
@@ -252,28 +253,16 @@ Rectangle {
                         }
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 160
-                        Layout.preferredHeight: 40
-                        radius: 10
-                        color: addExerciseArea.pressed ? "#5A52E8" :
-                            addExerciseArea.containsMouse ? "#7B73FF" : "#6C63FF"
+                    Components.GenericButton {
+                        width: 160; height: 40; fontSize: 14; buttonRadius: 10
+                        text: "+ Add exercise"
+                        textColor: "#ffffff"
+                        normalColor: "#6C63FF"
+                        hoverColor: "#7B73FF"
+                        pressedColor: "#5A52E8"
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "+ Add exercise"
-                            color: "#ffffff"
-                            font.pixelSize: 14
-                            font.weight: Font.DemiBold
-                        }
-
-                        MouseArea {
-                            id: addExerciseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: exercisesModel.append({ "name": "" })
-                        }
+                        // onClicked: exercisesModel.append({ "name": "" })
+                        onClicked: root.addExerciseRequested()
                     }
                 }
 
@@ -465,5 +454,15 @@ Rectangle {
             exercisesModel.append({ "name": "" })
 
         root.visible = true
+    }
+
+    function addExerciseName(exerciseName) {
+        var lastIndex = exercisesModel.count - 1
+        if (lastIndex >= 0 && (exercisesModel.get(lastIndex).name || "").trim() === "") {
+            exercisesModel.setProperty(lastIndex, "name", exerciseName)
+        }
+        else {
+            exercisesModel.append({ "name": exerciseName })
+        }
     }
 }

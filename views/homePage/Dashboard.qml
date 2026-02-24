@@ -451,23 +451,42 @@ Rectangle {
         id: addExercisePopup
         anchors.fill: parent
 
+        property bool calledFromSeance: false
+
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
+            // If called from AddSeancePopup, just pass the name back
+            if (calledFromSeance) {
+                calledFromSeance = false
+                addSeancePopup.visible = true
+                addSeancePopup.addExerciseName(name)
+
+                if (root.currentUserId > 0) {
+                    DatabaseManager.addExercise(
+                        root.currentUserId,
+                        name, reps, series, weight, grip, notes)
+                }
+                return
+            }
+
             console.log("Adding exercise for userId:", root.currentUserId)
             console.log("data:", name, reps, series, weight, grip, notes)
 
-            // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
                 console.error("Error: userId no valid:", root.currentUserId)
                 return
             }
 
-            // Call DatabaseManager to save the exercise
             DatabaseManager.addExercise(
                 root.currentUserId,
-                name, reps, series, weight, grip, notes )
+                name, reps, series, weight, grip, notes)
         }
 
         onCancelled: {
+            // If it was called from the seance, show it again.
+            if (calledFromSeance) {
+                calledFromSeance = false
+                addSeancePopup.visible = true
+            }
             console.log("Exercise creation cancelled")
         }
     }
@@ -476,6 +495,13 @@ Rectangle {
     ItemsExercise.AddSeancePopup {
         id: addSeancePopup
         anchors.fill: parent
+
+        onAddExerciseRequested: {
+            // Hide the seance pop-up and open the exercise pop-up.
+            addSeancePopup.visible = false
+            addExercisePopup.calledFromSeance = true
+            addExercisePopup.show()
+        }
 
         onSeanceAdded: function(name, exercises, warmUp, notes) {
             console.log("Seance added for userId:", root.currentUserId)
