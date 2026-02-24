@@ -223,30 +223,16 @@ Rectangle {
                                         onTextChanged: exercisesModel.setProperty(index, "name", text)
                                     }
 
-                                    Rectangle {
+                                    Components.GenericButton {
                                         Layout.preferredWidth: 40
                                         Layout.preferredHeight: 45
-                                        radius: 8
-                                        color: removeArea.pressed ? "#5a5a5a" :
-                                            removeArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
-                                        opacity: exercisesModel.count > 1 ? 1.0 : 0.5
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "−"
-                                            color: "#ffffff"
-                                            font.pixelSize: 20
-                                            font.weight: Font.DemiBold
-                                        }
-
-                                        MouseArea {
-                                            id: removeArea
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: exercisesModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            enabled: exercisesModel.count > 1
-                                            onClicked: exercisesModel.remove(index)
-                                        }
+                                        buttonRadius: 8; fontSize: 20
+                                        text: "−"
+                                        normalColor: "#3a3a3a"
+                                        hoverColor: "#4a4a4a"
+                                        pressedColor: "#5a5a5a"
+                                        enabled: exercisesModel.count > 1
+                                        onClicked: exercisesModel.remove(index)
                                     }
                                 }
                             }
@@ -314,84 +300,52 @@ Rectangle {
 
                 Item { Layout.fillWidth: true } // Spacer
 
-                // Buttonn Cancel
-                Rectangle {
+                // Cancel button
+                Components.GenericButton {
                     Layout.preferredWidth: 120
                     Layout.preferredHeight: 45
-                    color: cancelArea.pressed ? "#5a5a5a" :
-                        cancelArea.containsMouse ? "#4a4a4a" : "#3a3a3a"
-                    radius: 10
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Cancel"
-                        color: "#ffffff"
-                        font.pixelSize: 16
-                        font.weight: Font.DemiBold
-                    }
-
-                    MouseArea {
-                        id: cancelArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-
-                        onClicked: {
-                            clearFields()
-                            root.visible = false
-                            root.cancelled()
-                        }
+                    buttonRadius: 10; fontSize: 16;
+                    normalColor: "#3a3a3a"
+                    hoverColor: "#4a4a4a"
+                    pressedColor: "#5a5a5a"
+                    text: "Cancel"
+                    onClicked: {
+                        clearFields()
+                        root.visible = false
+                        root.cancelled()
                     }
                 }
 
                 // Button Add Seance
-                Rectangle {
+                Components.GenericButton {
                     Layout.preferredWidth: 150
                     Layout.preferredHeight: 45
-                    color: !isFormValid() ? "#404040" :
-                        addArea.pressed ? "#5A52E8" :
-                            addArea.containsMouse ? "#7B73FF" : "#6C63FF"
-                    radius: 10
-                    opacity: isFormValid() ? 1.0 : 0.6
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.editMode ? "Save Changes" : "Add Seance"
-                        color: "#ffffff"
-                        font.pixelSize: 16
-                        font.weight: Font.DemiBold
-                    }
+                    buttonRadius: 10; fontSize: 16
+                    text: root.editMode ? "Save Changes" : "Add Seance"
+                    enabled: isFormValid()
 
-                    MouseArea {
-                        id: addArea
-                        anchors.fill: parent
-                        hoverEnabled: isFormValid()
-                        cursorShape: isFormValid() ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        enabled: isFormValid()
-
-                        onClicked: {
-                            if (isFormValid()) {
-                                if (root.editMode) {
-                                    root.seanceUpdated(
-                                        root.editSeanceId,
-                                        seanceNameField.text,
-                                        getExercises().join(", "),
-                                        warmUpExercise.currentText,
-                                        notesArea.text
-                                    )
-                                }
-                                else {
-                                    root.seanceAdded(
-                                        seanceNameField.text,
-                                        getExercises().join(", "),
-                                        warmUpExercise.currentText,
-                                        notesArea.text
-                                    )
-                                }
-                                clearFields()
-                                root.visible = false
-                            }
+                    onClicked: {
+                        if (root.editMode) {
+                            root.seanceUpdated(
+                                root.editSeanceId,
+                                seanceNameField.text,
+                                getExercises().join(", "),
+                                warmUpExercise.currentText,
+                                notesArea.text
+                            )
                         }
+                        else {
+                            root.seanceAdded(
+                                seanceNameField.text,
+                                getExercises().join(", "),
+                                warmUpExercise.currentText,
+                                notesArea.text
+                            )
+                        }
+                        clearFields()
+                        root.visible = false
                     }
                 }
             }
