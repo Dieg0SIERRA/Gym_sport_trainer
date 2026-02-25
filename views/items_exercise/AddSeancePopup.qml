@@ -13,6 +13,7 @@ Rectangle {
 
     signal seanceAdded(string name, var exercises, string warmUp, string notes)
     signal addExerciseRequested()
+    signal addExerciseFromListRequested()
     signal cancelled()
 
     // ── Edit mode properties ──
@@ -239,16 +240,28 @@ Rectangle {
                         }
                     }
 
-                    Components.GenericButton {
-                        width: 160; height: 40; fontSize: 14; buttonRadius: 10
-                        text: "+ Add exercise"
-                        textColor: "#ffffff"
-                        normalColor: "#6C63FF"
-                        hoverColor: "#7B73FF"
-                        pressedColor: "#5A52E8"
+                    RowLayout {
+                        spacing: 10
 
-                        // onClicked: exercisesModel.append({ "name": "" })
-                        onClicked: root.addExerciseRequested()
+                        Components.GenericButton {
+                            width: 160; height: 40; fontSize: 14; buttonRadius: 10
+                            text: "+ Add new exercise"
+                            textColor: "#ffffff"
+                            normalColor: "#6C63FF"
+                            hoverColor: "#7B73FF"
+                            pressedColor: "#5A52E8"
+                            onClicked: root.addExerciseRequested()
+                        }
+
+                        Components.GenericButton {
+                            width: 160; height: 40; fontSize: 14; buttonRadius: 10
+                            text: "Exercise list"
+                            textColor: "#ffffff"
+                            normalColor: "#6C63FF"
+                            hoverColor: "#7B73FF"
+                            pressedColor: "#5A52E8"
+                            onClicked: root.addExerciseFromListRequested()
+                        }
                     }
                 }
 

@@ -503,6 +503,11 @@ Rectangle {
             addExercisePopup.show()
         }
 
+        onAddExerciseFromListRequested: {
+            addSeancePopup.visible = false
+            selectExercisePopup.show()
+        }
+
         onSeanceAdded: function(name, exercises, warmUp, notes) {
             console.log("Seance added for userId:", root.currentUserId)
             console.log("data:", name, exercises, warmUp, notes)
@@ -548,6 +553,22 @@ Rectangle {
 
         onCancelled: {
             console.log("Note creation cancelled")
+        }
+    }
+
+    // Pop-up to select exercise from list
+    ItemsExercise.SelectExercisePopup {
+        id: selectExercisePopup
+        anchors.fill: parent
+        userId: root.currentUserId
+
+        onExerciseSelected: function(name) {
+            addSeancePopup.visible = true
+            addSeancePopup.addExerciseName(name)
+        }
+
+        onCancelled: {
+            addSeancePopup.visible = true
         }
     }
 
