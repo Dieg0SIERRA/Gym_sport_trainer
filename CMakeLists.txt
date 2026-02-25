@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #Search for required Qt packages
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Sql QuickControls2)
 
-# Crear el ejecutable
+# Create the executable
 qt_add_executable(appGymTracker
     main.cpp
     database/databasemanager.h
@@ -35,6 +35,7 @@ qt_add_qml_module(appGymTracker URI GymTracker VERSION 1.0
         views/items_exercise/AddSeancePopup.qml
         views/items_exercise/SeanceCard.qml
         views/items_exercise/SeanceList.qml
+        views/items_exercise/SelectExercisePopup.qml
         views/calendar/NotePopUp.qml
         views/calendar/CalendarWidget.qml
 )
