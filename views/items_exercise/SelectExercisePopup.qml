@@ -13,7 +13,7 @@ Rectangle {
     property int userId: -1
     property var exercises: []
 
-    signal exerciseSelected(string name)
+    signal exerciseSelected(var exercise)
     signal cancelled()
 
     MouseArea {
@@ -169,7 +169,16 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.exerciseSelected(model.name)
+                                var exercise = {
+                                    id: model.id,
+                                    nombre: model.name,
+                                    repeticiones: model.repetitions,
+                                    series: model.series,
+                                    peso: model.weight,
+                                    grip: model.grip,
+                                    notas: model.notes || ""
+                                }
+                                root.exerciseSelected(exercise)
                                 root.visible = false
                             }
                         }

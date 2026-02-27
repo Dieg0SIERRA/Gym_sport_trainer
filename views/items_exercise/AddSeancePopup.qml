@@ -24,7 +24,7 @@ Rectangle {
 
     ListModel {
         id: exercisesModel
-        ListElement { name: "" }
+        // Model will contain: { id, nombre, repeticiones, series, peso, grip, notas }
     }
 
     // Close pop-up when clicking outside
@@ -177,7 +177,7 @@ Rectangle {
                     }
                 }
 
-                // Exercise Name
+                // Exercise section
                 Text {
                     Layout.columnSpan: 2
                     text: "Exercises"
@@ -201,43 +201,71 @@ Rectangle {
                         ColumnLayout {
                             id: exercisesColumn
                             width: parent.width
-                            spacing: 10
+                            spacing: 8
 
                             Repeater {
                                 model: exercisesModel
 
-                                RowLayout {
+                                Rectangle {
                                     Layout.fillWidth: true
-                                    spacing: 10
+                                    Layout.preferredHeight: 70
+                                    color: "#1a1a1a"
+                                    radius: 8
+                                    border.width: 1
+                                    border.color: "#404040"
 
-                                    Components.GenericTextField {
-                                        Layout.fillWidth: true
-                                        Layout.preferredHeight: 45
-                                        labelText: ""
-                                        placeholderText: "e.g., Bench Press"
-                                        fieldBackgroundColor: "#1a1a1a"
-                                        fieldRadius: 8
-                                        fontSize: 14
-                                        labelFontSize: 14
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 12
+                                        spacing: 12
 
-                                        text: name
-                                        onTextChanged: exercisesModel.setProperty(index, "name", text)
-                                    }
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 4
 
-                                    Components.GenericButton {
-                                        Layout.preferredWidth: 40
-                                        Layout.preferredHeight: 45
-                                        buttonRadius: 8; fontSize: 20
-                                        text: "−"
-                                        normalColor: "#3a3a3a"
-                                        hoverColor: "#4a4a4a"
-                                        pressedColor: "#5a5a5a"
-                                        enabled: exercisesModel.count > 1
-                                        onClicked: exercisesModel.remove(index)
+                                            Text {
+                                                text: model.nombre || "Exercise name"
+                                                color: "#ffffff"
+                                                font.pixelSize: 15
+                                                font.weight: Font.Medium
+                                            }
+
+                                            Text {
+                                                text: model.repeticiones + " reps · " + 
+                                                      model.series + " sets · " + 
+                                                      model.peso + " kg · " + 
+                                                      model.grip
+                                                color: "#7f8c8d"
+                                                font.pixelSize: 12
+                                            }
+                                        }
+
+                                        Components.GenericButton {
+                                            Layout.preferredWidth: 40
+                                            Layout.preferredHeight: 40
+                                            buttonRadius: 8
+                                            fontSize: 18
+                                            text: "×"
+                                            normalColor: "#3a3a3a"
+                                            hoverColor: "#e74c3c"
+                                            pressedColor: "#c0392b"
+                                            onClicked: exercisesModel.remove(index)
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+
+                    // Empty state
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        visible: exercisesModel.count === 0
+                        text: "No exercises added yet"
+                        color: "#7f8c8d"
+                        font.pixelSize: 14
+                        horizontalAlignment: Text.AlignHCenter
                     }
 
                     RowLayout {
@@ -366,13 +394,13 @@ Rectangle {
     }
 
     function getExercises() {
-        var list = []
+        var ids = []
         for (var i = 0; i < exercisesModel.count; i++) {
-            var exerciseName = (exercisesModel.get(i).name || "").trim()
-            if (exerciseName !== "")
-                list.push(exerciseName)
+            var exerciseId = exercisesModel.get(i).id
+            if (exerciseId !== undefined && exerciseId > 0)
+                ids.push(exerciseId)
         }
-        return list
+        return ids
     }
 
     function isFormValid() {
@@ -385,7 +413,6 @@ Rectangle {
     function clearFields() {
         // seanceNameField.clear()
         exercisesModel.clear()
-        exercisesModel.append({ "name": "" })
         warmUpExercise.currentIndex = 0
         notesArea.text = ""
     }
@@ -409,27 +436,34 @@ Rectangle {
         var idx = warmUpOptions.indexOf(warmUp)
         warmUpExercise.currentIndex = idx >= 0 ? idx : 0
 
-        // Populate exercises
+        // Populate exercises (exercises is now an array of objects)
         exercisesModel.clear()
-        var exerciseArray = exercises.split(",")
-        for (var i = 0; i < exerciseArray.length; i++) {
-            var trimmed = exerciseArray[i].trim()
-            if (trimmed !== "")
-                exercisesModel.append({ "name": trimmed })
+        if (Array.isArray(exercises)) {
+            for (var i = 0; i < exercises.length; i++) {
+                exercisesModel.append(exercises[i])
+            }
         }
-        if (exercisesModel.count === 0)
-            exercisesModel.append({ "name": "" })
 
         root.visible = true
     }
 
-    function addExerciseName(exerciseName) {
-        var lastIndex = exercisesModel.count - 1
-        if (lastIndex >= 0 && (exercisesModel.get(lastIndex).name || "").trim() === "") {
-            exercisesModel.setProperty(lastIndex, "name", exerciseName)
+    function addExercise(exercise) {
+        // Check if exercise already exists
+        for (var i = 0; i < exercisesModel.count; i++) {
+            if (exercisesModel.get(i).id === exercise.id) {
+                console.log("Exercise already added")
+                return
+            }
         }
-        else {
-            exercisesModel.append({ "name": exerciseName })
-        }
+        
+        exercisesModel.append({
+            "id": exercise.id,
+            "nombre": exercise.nombre,
+            "repeticiones": exercise.repeticiones,
+            "series": exercise.series,
+            "peso": exercise.peso,
+            "grip": exercise.grip,
+            "notas": exercise.notas || ""
+        })
     }
 }
