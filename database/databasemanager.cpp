@@ -545,7 +545,10 @@ QVariantList DatabaseManager::getSeanceByUser(int userId)
         QVariantMap seance;
         seance["id"] = query.value(0).toInt();
         seance["name"] = query.value(1).toString();
-        seance["exerciselist"] = query.value(2).toString();
+        
+        QString exerciseIds = query.value(2).toString();
+        seance["exerciselist"] = getExercisesByIds(exerciseIds);  // Convert IDs to full exercise objects
+        
         seance["warmup"] = query.value(3).toString();
         seance["notes"] = query.value(4).toString();
         seance["created_at"] = query.value(5).toString();
@@ -555,6 +558,42 @@ QVariantList DatabaseManager::getSeanceByUser(int userId)
 
     qDebug() << "Obtained seance:" << seances.size() << "for user_id:" << userId;
     return seances;
+}
+
+QVariantList DatabaseManager::getExercisesByIds(const QString &exerciseIds)
+{
+    QVariantList exercises;
+    
+    if (exerciseIds.trimmed().isEmpty()) {
+        return exercises;
+    }
+    
+    QStringList ids = exerciseIds.split(",", Qt::SkipEmptyParts);
+    
+    for (const QString &id : ids) {
+        QString trimmedId = id.trimmed();
+        if (trimmedId.isEmpty()) continue;
+        
+        QSqlQuery query(m_database);
+        query.prepare("SELECT id, exercise_name, repetitions, series, weight, grip, notes FROM exercises WHERE id = :id");
+        query.bindValue(":id", trimmedId.toInt());
+        
+        if (query.exec() && query.next()) {
+            QVariantMap exercise;
+            exercise["id"] = query.value(0).toInt();
+            exercise["nombre"] = query.value(1).toString();
+            exercise["repeticiones"] = query.value(2).toString();
+            exercise["series"] = query.value(3).toInt();
+            exercise["peso"] = query.value(4).toDouble();
+            exercise["grip"] = query.value(5).toString();
+            exercise["notas"] = query.value(6).toString();
+            
+            exercises.append(exercise);
+        }
+    }
+    
+    qDebug() << "Obtained exercises:" << exercises.size() << "from IDs:" << exerciseIds;
+    return exercises;
 }
 
 bool DatabaseManager::deleteSeance(int seanceId)
