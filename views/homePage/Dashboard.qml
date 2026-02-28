@@ -313,6 +313,7 @@ Rectangle {
 
             onEditSeance: function(seanceId) {
                 console.log("Edit seance:", seanceId)
+
                 // Find the seance data and open the popup in edit mode
                 var seances = DatabaseManager.getSeanceByUser(root.currentUserId)
                 for (var i = 0; i < seances.length; i++) {
@@ -517,16 +518,22 @@ Rectangle {
                 return
             }
 
+            // Convert array of IDs to string "1,5,12"
+            var exercisesString = exercises.join(",")
+
             DatabaseManager.addSeance(
-                root.currentUserId, name, exercises, warmUp, notes )
+                root.currentUserId, name, exercisesString, warmUp, notes )
         }
 
         onSeanceUpdated: function(seanceId, name, exercises, warmUp, notes) {
             console.log("Seance edited, id:", seanceId)
             console.log("data:", name, exercises, warmUp, notes)
 
+            // Convert array of IDs to string "1,5,12"
+            var exercisesString = exercises.join(",")
+
             DatabaseManager.updateSeance(
-                seanceId, name, exercises, warmUp, notes )
+                seanceId, name, exercisesString, warmUp, notes )
         }
 
         onCancelled: {
@@ -562,9 +569,9 @@ Rectangle {
         anchors.fill: parent
         userId: root.currentUserId
 
-        onExerciseSelected: function(name) {
+        onExerciseSelected: function(exercise) {
             addSeancePopup.visible = true
-            addSeancePopup.addExerciseName(name)
+            addSeancePopup.addExercise(exercise)
         }
 
         onCancelled: {

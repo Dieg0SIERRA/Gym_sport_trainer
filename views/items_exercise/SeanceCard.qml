@@ -152,6 +152,86 @@ Rectangle {
                     color: "#7f8c8d"
                 }
             }
+
+            // Exercises section
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 15
+                columns: 4
+                columnSpacing: 10
+                rowSpacing: 8
+
+                // Headers
+                Text {
+                    text: "Repeticiones"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#2c3e50"
+                }
+
+                Text {
+                    text: "Series"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#2c3e50"
+                }
+
+                Text {
+                    text: "Peso"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#2c3e50"
+                }
+
+                Text {
+                    text: "Grip"
+                    font.pixelSize: 13
+                    font.bold: true
+                    color: "#2c3e50"
+                }
+
+                // Exercise rows
+                Repeater {
+                    model: root.exerciseList
+
+                    delegate: Item {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 4
+                        Layout.preferredHeight: exerciseRow.height
+
+                        GridLayout {
+                            id: exerciseRow
+                            width: parent.width
+                            columns: 4
+                            columnSpacing: 10
+
+                            Text {
+                                text: modelData.repeticiones || "-"
+                                font.pixelSize: 13
+                                color: "#34495e"
+                            }
+
+                            Text {
+                                text: modelData.series || "-"
+                                font.pixelSize: 13
+                                color: "#34495e"
+                            }
+
+                            Text {
+                                text: modelData.peso ? modelData.peso + " kg" : "-"
+                                font.pixelSize: 13
+                                color: "#34495e"
+                            }
+
+                            Text {
+                                text: modelData.grip || "-"
+                                font.pixelSize: 13
+                                color: "#34495e"
+                            }
+                        }
+                    }
+                }
+            }
             
             // Notes
             Text {
