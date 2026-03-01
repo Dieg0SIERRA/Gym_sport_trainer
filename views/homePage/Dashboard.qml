@@ -455,20 +455,6 @@ Rectangle {
         property bool calledFromSeance: false
 
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
-            // If called from AddSeancePopup, just pass the name back
-            if (calledFromSeance) {
-                calledFromSeance = false
-                addSeancePopup.visible = true
-                addSeancePopup.addExerciseName(name)
-
-                if (root.currentUserId > 0) {
-                    DatabaseManager.addExercise(
-                        root.currentUserId,
-                        name, reps, series, weight, grip, notes)
-                }
-                return
-            }
-
             console.log("Adding exercise for userId:", root.currentUserId)
             console.log("data:", name, reps, series, weight, grip, notes)
 
@@ -477,9 +463,31 @@ Rectangle {
                 return
             }
 
-            DatabaseManager.addExercise(
+            // Always add to database first
+            var newExerciseId = DatabaseManager.addExercise(
                 root.currentUserId,
                 name, reps, series, weight, grip, notes)
+
+            if (newExerciseId < 0) {
+                    console.error("Failed to add exercise to database")
+                    return
+                }
+                console.log("Exercise added with ID:", newExerciseId)
+
+                if (calledFromSeance) {
+                    calledFromSeance = false
+                    addSeancePopup.visible = true
+
+                    addSeancePopup.addExercise({
+                        id: newExerciseId,
+                        nombre: name,
+                        repeticiones: reps,
+                        series: series,
+                        peso: weight,
+                        grip: grip,
+                        notas: notes || ""
+                    })
+                }
         }
 
         onCancelled: {

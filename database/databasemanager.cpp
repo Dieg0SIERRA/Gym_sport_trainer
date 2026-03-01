@@ -253,15 +253,14 @@ bool DatabaseManager::addExercise(int userId, const QString &name, const QString
 {
     if (name.trimmed().isEmpty() || repetitions.trimmed().isEmpty()) {
         emit exerciseAdded(false, "El nombre y repeticiones son obligatorios");
-        return false;
+        return -1;
     }
 
     if (series <= 0 || weight < 0) {
         emit exerciseAdded(false, "Series y peso deben ser valores válidos");
-        return false;
+        return -1;
     }
 
-    // Insert exercise
     QSqlQuery query(m_database);
     query.prepare(R"(
         INSERT INTO exercises (user_id, exercise_name, repetitions, series, weight, grip, notes)
@@ -279,12 +278,18 @@ bool DatabaseManager::addExercise(int userId, const QString &name, const QString
     if (!query.exec()) {
         qWarning() << "Error al agregar ejercicio:" << query.lastError().text();
         emit exerciseAdded(false, "Error al guardar el ejercicio");
-        return false;
+        return -1;
     }
 
-    qDebug() << "Ejercicio agregado exitosamente:" << name << "para user_id:" << userId;
+    int newExerciseId = query.lastInsertId().toInt();
+
+    qDebug() << "Ejercicio agregado exitosamente:" << name
+             << "para user_id:" << userId
+             << "con ID:" << newExerciseId;
+
     emit exerciseAdded(true, "Ejercicio agregado exitosamente");
-    return true;
+
+    return newExerciseId;
 }
 
 QVariantList DatabaseManager::getExercisesByUser(int userId)

@@ -372,7 +372,7 @@ Rectangle {
                             root.seanceUpdated(
                                 root.editSeanceId,
                                 seanceNameField.text,
-                                getExercises().join(", "),
+                                getExercises(),
                                 warmUpExercise.currentText,
                                 notesArea.text
                             )
@@ -380,7 +380,7 @@ Rectangle {
                         else {
                             root.seanceAdded(
                                 seanceNameField.text,
-                                getExercises().join(", "),
+                                getExercises(),
                                 warmUpExercise.currentText,
                                 notesArea.text
                             )
