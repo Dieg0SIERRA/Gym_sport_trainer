@@ -9,7 +9,7 @@ Rectangle {
     // Seance properties
     property int seanceId: 0
     property string seanceName: ""
-    property string exerciseList: ""
+    property var exerciseList: []  // Changed to var to accept array
     property string warmUp: ""
     property string notes: ""
     property string createdAt: ""
@@ -19,7 +19,7 @@ Rectangle {
     signal deleteClicked(int id)
     
     width: parent.width
-    height: expanded ? 220 : 120
+    height: expanded ? Math.max(contentColumn.implicitHeight + 40, 400) : 120
     color: "#ffffff"
     radius: 15
     border.color: "#e0e0e0"
@@ -38,6 +38,7 @@ Rectangle {
     }
     
     ColumnLayout {
+        id: contentColumn
         anchors.fill: parent
         anchors.margins: 20
         spacing: 12
@@ -79,7 +80,7 @@ Rectangle {
                     spacing: 15
                     
                     Text {
-                        text: "📊 " + root.exerciseList
+                        text: "📊 " + (root.exerciseList && root.exerciseList.count !== undefined ? root.exerciseList.count : 0) + " exercises"
                         font.pixelSize: 14
                         color: "#7f8c8d"
                     }
@@ -154,79 +155,104 @@ Rectangle {
             }
 
             // Exercises section
-            GridLayout {
+            ColumnLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: 15
-                columns: 4
-                columnSpacing: 10
-                rowSpacing: 8
-
-                // Headers
+                spacing: 8
+                
                 Text {
-                    text: "Repeticiones"
-                    font.pixelSize: 13
-                    font.bold: true
+                    text: "Exercises:"
+                    font.pixelSize: 14
+                    font.weight: Font.Bold
                     color: "#2c3e50"
+                    visible: root.exerciseList && root.exerciseList.count > 0
                 }
 
-                Text {
-                    text: "Series"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: "#2c3e50"
-                }
-
-                Text {
-                    text: "Peso"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: "#2c3e50"
-                }
-
-                Text {
-                    text: "Grip"
-                    font.pixelSize: 13
-                    font.bold: true
-                    color: "#2c3e50"
-                }
-
-                // Exercise rows
                 Repeater {
                     model: root.exerciseList
+                    visible: root.exerciseList && root.exerciseList.count > 0
 
-                    delegate: Item {
+                    Rectangle {
                         Layout.fillWidth: true
-                        Layout.columnSpan: 4
-                        Layout.preferredHeight: exerciseRow.height
+                        Layout.preferredHeight: exerciseContent.implicitHeight + 20
+                        color: "#f8f9fa"
+                        radius: 8
+                        border.color: "#e0e0e0"
+                        border.width: 1
 
-                        GridLayout {
-                            id: exerciseRow
-                            width: parent.width
-                            columns: 4
-                            columnSpacing: 10
+                        ColumnLayout {
+                            id: exerciseContent
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            spacing: 6                            
 
-                            Text {
-                                text: modelData.repeticiones || "-"
-                                font.pixelSize: 13
-                                color: "#34495e"
-                            }
+                            // Exercise details in a grid
+                            GridLayout {
+                                Layout.fillWidth: true
+                                columns: 9
+                                columnSpacing: 15
+                                rowSpacing: 4
 
-                            Text {
-                                text: modelData.series || "-"
-                                font.pixelSize: 13
-                                color: "#34495e"
-                            }
+                                // Exercise name
+                                Text {
+                                    text: model.nombre || "Unknown exercise"
+                                    font.pixelSize: 14
+                                    font.weight: Font.Bold
+                                    color: "#2c3e50"
+                                    Layout.fillWidth: true
+                                }
 
-                            Text {
-                                text: modelData.peso ? modelData.peso + " kg" : "-"
-                                font.pixelSize: 13
-                                color: "#34495e"
-                            }
+                                // Repeticiones
+                                Text {
+                                    text: "Reps:"
+                                    font.pixelSize: 12
+                                    color: "#7f8c8d"
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: model.repeticiones || "-"
+                                    font.pixelSize: 12
+                                    color: "#34495e"
+                                }
 
-                            Text {
-                                text: modelData.grip || "-"
-                                font.pixelSize: 13
-                                color: "#34495e"
+                                // Series
+                                Text {
+                                    text: "Sets:"
+                                    font.pixelSize: 12
+                                    color: "#7f8c8d"
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: model.series || "-"
+                                    font.pixelSize: 12
+                                    color: "#34495e"
+                                }
+
+                                // Peso
+                                Text {
+                                    text: "Weight:"
+                                    font.pixelSize: 12
+                                    color: "#7f8c8d"
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: model.peso ? model.peso + " kg" : "-"
+                                    font.pixelSize: 12
+                                    color: "#34495e"
+                                }
+
+                                // Grip
+                                Text {
+                                    text: "Grip:"
+                                    font.pixelSize: 12
+                                    color: "#7f8c8d"
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: model.grip || "-"
+                                    font.pixelSize: 12
+                                    color: "#34495e"
+                                }
                             }
                         }
                     }
