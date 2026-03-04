@@ -231,9 +231,9 @@ Rectangle {
                                             }
 
                                             Text {
-                                                text: model.repeticiones + " reps · " + 
-                                                      model.series + " sets · " + 
-                                                      model.peso + " kg · " + 
+                                                text: model.repeticiones + " reps · " +
+                                                      model.series + " sets · " +
+                                                      model.peso + " kg · " +
                                                       model.grip
                                                 color: "#7f8c8d"
                                                 font.pixelSize: 12
@@ -436,67 +436,14 @@ Rectangle {
         var idx = warmUpOptions.indexOf(warmUp)
         warmUpExercise.currentIndex = idx >= 0 ? idx : 0
 
-        // Populate exercises from QVariantList
+        // Populate exercises (exercises is now an array of objects)
         exercisesModel.clear()
-        
-        if (!exercises) {
-            root.visible = true
-            return
-        }
-        
-        // QVariantList from C++ can be accessed with numeric indices
-        try {
-            // Check if it has a length property
-            if (exercises.length !== undefined) {
-                for (var i = 0; i < exercises.length; i++) {
-                    if (exercises[i]) {
-                        exercisesModel.append({
-                            "id": exercises[i].id || 0,
-                            "nombre": exercises[i].nombre || "",
-                            "repeticiones": exercises[i].repeticiones || "",
-                            "series": exercises[i].series || 0,
-                            "peso": exercises[i].peso || 0,
-                            "grip": exercises[i].grip || "",
-                            "notas": exercises[i].notas || ""
-                        })
-                    }
-                }
-            }
-            // Check if it's a ListModel (has count property)
-            else if (exercises.count !== undefined) {
-                for (var i = 0; i < exercises.count; i++) {
-                    var exercise = exercises.get(i)
-                    exercisesModel.append({
-                        "id": exercise.id,
-                        "nombre": exercise.nombre,
-                        "repeticiones": exercise.repeticiones,
-                        "series": exercise.series,
-                        "peso": exercise.peso,
-                        "grip": exercise.grip,
-                        "notas": exercise.notas || ""
-                    })
-                }
-            }
-            // Iterate as object with numeric keys
-            else {
-                var i = 0
-                while (exercises[i] !== undefined) {
-                    exercisesModel.append({
-                        "id": exercises[i].id || 0,
-                        "nombre": exercises[i].nombre || "",
-                        "repeticiones": exercises[i].repeticiones || "",
-                        "series": exercises[i].series || 0,
-                        "peso": exercises[i].peso || 0,
-                        "grip": exercises[i].grip || "",
-                        "notas": exercises[i].notas || ""
-                    })
-                    i++
-                }
+        if (Array.isArray(exercises)) {
+            for (var i = 0; i < exercises.length; i++) {
+                exercisesModel.append(exercises[i])
             }
         }
-        catch (error) {
-            console.error("Error processing exercises:", error)
-        }
+
         root.visible = true
     }
 
@@ -508,7 +455,7 @@ Rectangle {
                 return
             }
         }
-        
+
         exercisesModel.append({
             "id": exercise.id,
             "nombre": exercise.nombre,
