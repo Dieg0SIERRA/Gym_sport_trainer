@@ -86,6 +86,7 @@ Rectangle {
                     id: seanceNameField
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 70
                     labelText: "Seance Name"
                     placeholderText: "e.g., Push seance"
                     fieldBackgroundColor: "#1a1a1a"
@@ -104,7 +105,7 @@ Rectangle {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 45
+                    Layout.preferredHeight: 40
                     color: "#1a1a1a"
                     radius: 8
                     border.width: warmUpExercise.pressed ? 2 : 1
@@ -206,29 +207,31 @@ Rectangle {
                             Repeater {
                                 model: exercisesModel
 
-                                Rectangle {
+                                RowLayout {
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: 70
-                                    color: "#1a1a1a"
-                                    radius: 8
-                                    border.width: 1
-                                    border.color: "#404040"
+                                    spacing: 40
 
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.margins: 12
-                                        spacing: 12
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 50
+                                        color: "#1a1a1a"
+                                        radius: 8
+                                        border.width: 1
+                                        border.color: "#404040"
 
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: 4
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            anchors.margins: 12
+                                            spacing: 30
 
                                             Text {
                                                 text: model.nombre || "Exercise name"
                                                 color: "#ffffff"
-                                                font.pixelSize: 15
+                                                font.pixelSize: 16
                                                 font.weight: Font.Medium
                                             }
+
+                                            Item { Layout.fillWidth: true }
 
                                             Text {
                                                 text: model.repeticiones + " reps · " +
@@ -236,20 +239,20 @@ Rectangle {
                                                       model.peso + " kg · " +
                                                       model.grip
                                                 color: "#7f8c8d"
-                                                font.pixelSize: 12
+                                                font.pixelSize: 14
                                             }
-                                        }
 
-                                        Components.GenericButton {
-                                            Layout.preferredWidth: 40
-                                            Layout.preferredHeight: 40
-                                            buttonRadius: 8
-                                            fontSize: 18
-                                            text: "×"
-                                            normalColor: "#3a3a3a"
-                                            hoverColor: "#e74c3c"
-                                            pressedColor: "#c0392b"
-                                            onClicked: exercisesModel.remove(index)
+                                            Components.GenericButton {
+                                                Layout.preferredWidth: 30
+                                                Layout.preferredHeight: 30
+                                                buttonRadius: 6
+                                                fontSize: 18
+                                                text: "×"
+                                                normalColor: "#3a3a3a"
+                                                hoverColor: "#e74c3c"
+                                                pressedColor: "#c0392b"
+                                                onClicked: exercisesModel.remove(index)
+                                            }
                                         }
                                     }
                                 }
