@@ -19,7 +19,7 @@ Rectangle {
     signal deleteClicked(int id)
     
     width: parent.width
-    height: expanded ? Math.max(contentColumn.implicitHeight + 40, 400) : 120
+    height: expanded ? Math.max(contentColumn.implicitHeight + 40, 300) : 120
     color: "#ffffff"
     radius: 15
     border.color: "#e0e0e0"
@@ -41,31 +41,31 @@ Rectangle {
         id: contentColumn
         anchors.fill: parent
         anchors.margins: 20
-        spacing: 12
+        spacing: 10
         
         // Header
         RowLayout {
             Layout.fillWidth: true
-            spacing: 15
+            spacing: 20
             
             // Icon
             Rectangle {
-                Layout.preferredWidth: 50
-                Layout.preferredHeight: 50
+                Layout.preferredWidth: 60
+                Layout.preferredHeight: 60
                 color: "#1E90FF"
-                radius: 25
+                radius: 30
                 
                 Text {
                     anchors.centerIn: parent
                     text: "💪"
-                    font.pixelSize: 24
+                    font.pixelSize: 30
                 }
             }
             
             // Main information
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 4
+                spacing: 5
                 
                 Text {
                     text: root.seanceName
@@ -77,7 +77,7 @@ Rectangle {
                 }
                 
                 RowLayout {
-                    spacing: 15
+                    spacing: 25
                     
                     Text {
                         text: "📊 " + (root.exerciseList && root.exerciseList.count !== undefined ? root.exerciseList.count : 0) + " exercises"
@@ -87,6 +87,12 @@ Rectangle {
                     
                     Text {
                         text: "⚖️ " + root.warmUp
+                        font.pixelSize: 14
+                        color: "#7f8c8d"
+                    }
+
+                    Text {
+                        text: root.notes !== "" ? "📝️ Notes" : ""
                         font.pixelSize: 14
                         color: "#7f8c8d"
                     }
@@ -129,8 +135,8 @@ Rectangle {
                 
                 Text {
                     text: "warm -up:"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
+                    font.pixelSize: 16
+                    font.weight: Font.Bold
                     color: "#2c3e50"
                 }
                 
@@ -139,30 +145,17 @@ Rectangle {
                     font.pixelSize: 14
                     color: "#7f8c8d"
                 }
-                
-                Text {
-                    text: "Created:"
-                    font.pixelSize: 14
-                    font.weight: Font.Medium
-                    color: "#2c3e50"
-                }
-                
-                Text {
-                    text: formatDate(root.createdAt)
-                    font.pixelSize: 14
-                    color: "#7f8c8d"
-                }
             }
 
             // Exercises section
             ColumnLayout {
                 Layout.fillWidth: true
-                Layout.topMargin: 15
-                spacing: 8
+                Layout.topMargin: 5
+                spacing: 10
                 
                 Text {
                     text: "Exercises:"
-                    font.pixelSize: 14
+                    font.pixelSize: 16
                     font.weight: Font.Bold
                     color: "#2c3e50"
                     visible: root.exerciseList && root.exerciseList.count > 0
@@ -174,7 +167,7 @@ Rectangle {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: exerciseContent.implicitHeight + 20
+                        Layout.preferredHeight: exerciseContent.implicitHeight + 12
                         color: "#f8f9fa"
                         radius: 8
                         border.color: "#e0e0e0"
@@ -183,15 +176,15 @@ Rectangle {
                         ColumnLayout {
                             id: exerciseContent
                             anchors.fill: parent
-                            anchors.margins: 10
-                            spacing: 6                            
+                            anchors.margins: 8
+                            spacing: 6
 
                             // Exercise details in a grid
                             GridLayout {
                                 Layout.fillWidth: true
-                                columns: 9
-                                columnSpacing: 15
-                                rowSpacing: 4
+                                columns: 10
+                                columnSpacing: 20
+                                rowSpacing: 6
 
                                 // Exercise name
                                 Text {
@@ -201,6 +194,8 @@ Rectangle {
                                     color: "#2c3e50"
                                     Layout.fillWidth: true
                                 }
+
+                                Item { Layout.fillWidth: true }
 
                                 // Repeticiones
                                 Text {
@@ -292,12 +287,26 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.topMargin: 5
                 spacing: 10
-                
+
+                Text {
+                    text: "Created:"
+                    font.pixelSize: 14
+                    font.weight: Font.Medium
+                    color: "#2c3e50"
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Text {
+                    text: formatDate(root.createdAt)
+                    font.pixelSize: 14
+                    color: "#7f8c8d"
+                    Layout.alignment: Qt.AlignRight
+                }
+
                 Item { Layout.fillWidth: true }
 
                 // Edit button
                 Components.GenericButton {
-                    Layout.alignment: Qt.AlignLeft
                     width: 80; height: 35; fontSize: 13; buttonRadius: 8
                     text: "✏️ Edit"
                     textColor: "white"
@@ -307,13 +316,11 @@ Rectangle {
 
                     onClicked: {
                         root.editClicked(root.seanceId)
-                        mouse.accepted = true
                     }
                 }
                 
                 // Delete button
                 Components.GenericButton {
-                    Layout.alignment: Qt.AlignLeft
                     width: 90; height: 35; fontSize: 13; buttonRadius: 8
                     text: "🗑️ Delete"
                     textColor: "white"
