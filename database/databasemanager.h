@@ -20,12 +20,19 @@ public:
     Q_INVOKABLE int getUserId(const QString &username);
     
     // Methods callable from QML - Exercises
-    Q_INVOKABLE bool addExercise(int userId, const QString &name, const QString &repetitions, 
+    Q_INVOKABLE bool addExercise(int userId, const QString &name, const QString &repetitions,
                                   int series, double weight, const QString &grip, const QString &notes);
     Q_INVOKABLE QVariantList getExercisesByUser(int userId);
     Q_INVOKABLE bool deleteExercise(int exerciseId);
     Q_INVOKABLE bool updateExercise(int exerciseId, const QString &name, const QString &repetitions, 
                                      int series, double weight, const QString &grip, const QString &notes);
+
+    // Methods callable from QML - Seance
+    Q_INVOKABLE bool addSeance(int userId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes);
+    Q_INVOKABLE QVariantList getSeanceByUser(int userId);
+    Q_INVOKABLE QVariantList getExercisesByIds(const QString &exerciseIds);
+    Q_INVOKABLE bool deleteSeance(int seanceId);
+    Q_INVOKABLE bool updateSeance(int seanceId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes);
 
     // Methods callable from QML - Calendar Notes
     Q_INVOKABLE bool saveCalendarNote(int userId, const QString &date, const QString &text, const QString &color);
@@ -41,6 +48,11 @@ signals:
     void exerciseAdded(bool success, const QString &message);
     void exerciseDeleted(bool success, const QString &message);
     void exerciseUpdated(bool success, const QString &message);
+
+    // Signals to notify QML - seance
+    void SeanceAdded(bool success, const QString &message);
+    void SeanceDeleted(bool success, const QString &message);
+    void SeanceUpdated(bool success, const QString &message);
 
     // Signals to notify QML - Calendar Notes
     void calendarNoteSaved(bool success, const QString &message);

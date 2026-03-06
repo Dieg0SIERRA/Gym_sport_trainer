@@ -1,9 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import "../calendar" as Calendar
 import "../components" as Components
 import "../items_exercise" as ItemsExercise
+import "../calendar" as Calendar
 
 Rectangle {
     id: root
@@ -39,10 +39,11 @@ Rectangle {
     readonly property int cardLabelSize: 16
     readonly property int cardEmojiSize: 32
 
-    // Add connections with DatabaseManager for exercises
+    // Add connections with DatabaseManager
     Connections {
         target: DatabaseManager
 
+        // Signals for Exercises
         function onExerciseAdded(success, message) {
             if (success) {
                 console.log("Exercise added successfully")
@@ -79,22 +80,59 @@ Rectangle {
             }
         }
 
+        // Signals for Calendar notes
         function onCalendarNoteSaved(success, message) {
             if (success) {
-                console.log("? Note saved successfully")
+                console.log("✓ Note saved successfully")
                 loadCalendarNotes()
             } else {
-                console.log("? Error saving note:", message)
+                console.log("✗ Error saving note:", message)
             }
         }
 
-        // NUEVO: Respuesta al eliminar nota
         function onCalendarNoteDeleted(success, message) {
             if (success) {
-                console.log("? Note deleted successfully")
+                console.log("✓ Note deleted successfully")
                 loadCalendarNotes()
             } else {
-                console.log("? Error deleting note:", message)
+                console.log("✗ Error deleting note:", message)
+            }
+        }
+
+        // Signals for Seance
+        function onSeanceAdded(success, message) {
+            if (success) {
+                console.log("Seance added successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when adding seance:", message)
+            }
+        }
+
+        function onSeanceDeleted(success, message) {
+            if (success) {
+                console.log("Seance deleted successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when deleting seance:", message)
+            }
+        }
+
+        function onSeanceUpdated(success, message) {
+            if (success) {
+                console.log("Seance updated successfully")
+                if (contentLoader.item && contentLoader.item.refresh) {
+                    contentLoader.item.refresh()
+                }
+            }
+            else {
+                console.log("Error when updating seance:", message)
             }
         }
     }
@@ -125,6 +163,7 @@ Rectangle {
                     pressedColor: root.pressedBlue
 
                     onClicked: {
+                        addSeancePopup.show()
                         console.log("Add seance clicked")
                     }
                 }
@@ -151,9 +190,8 @@ Rectangle {
                 Components.GenericButton {
                     Layout.preferredWidth: root.buttonWidth
                     Layout.preferredHeight: root.buttonHeight
+                    buttonRadius: 8; fontSize: 18;
                     text: "🏃 + Add exercise"
-                    fontSize: root.buttonFontSize
-                    buttonRadius: root.buttonRadius
                     normalColor: root.primaryBlue
                     hoverColor: root.hoverBlue
                     pressedColor: root.pressedBlue
@@ -268,38 +306,33 @@ Rectangle {
     Component {
         id: seanceContent
 
-        Column {
-            anchors.centerIn: parent
-            spacing: 20
+        ItemsExercise.SeanceList {
+            id: seanceListComponent
+            anchors.fill: parent
+            userId: root.currentUserId
 
-            Text {
-                text: "SEANCE"
-                font.pixelSize: 32
-                font.weight: Font.Bold
-                color: "#2c3e50"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+            onEditSeance: function(seanceId) {
+                console.log("Edit seance:", seanceId)
 
-            Text {
-                text: "Training sessions management"
-                font.pixelSize: 16
-                color: "#7f8c8d"
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            // Add seance button
-            Components.GenericButton {
-                width: 200; height: 50; buttonRadius: 14; fontSize: 18;
-                Layout.preferredWidth: root.buttonWidth
-                Layout.preferredHeight: root.buttonHeight
-                text: "🏋 + Add seance"
-                normalColor: root.primaryBlue
-                hoverColor: root.hoverBlue
-                pressedColor: root.pressedBlue
-
-                onClicked: {
-                    console.log("Add seance clicked")
+                // Find the seance data and open the popup in edit mode
+                var seances = DatabaseManager.getSeanceByUser(root.currentUserId)
+                for (var i = 0; i < seances.length; i++) {
+                    if (seances[i].id === seanceId) {
+                        addSeancePopup.showEdit(
+                            seances[i].id,
+                            seances[i].name,
+                            seances[i].exerciselist,
+                            seances[i].warmup,
+                            seances[i].notes
+                        )
+                        return
+                    }
                 }
+            }
+
+            onDeleteSeance: function(seanceId) {
+                console.log("Delete seance:", seanceId)
+                DatabaseManager.deleteSeance(seanceId)
             }
         }
     }
@@ -419,26 +452,96 @@ Rectangle {
         id: addExercisePopup
         anchors.fill: parent
 
+        property bool calledFromSeance: false
+
         onExerciseAdded: function(name, reps, series, weight, grip, notes) {
             console.log("Adding exercise for userId:", root.currentUserId)
             console.log("data:", name, reps, series, weight, grip, notes)
 
-            // Validate that we have a valid userId
             if (root.currentUserId <= 0) {
                 console.error("Error: userId no valid:", root.currentUserId)
                 return
             }
 
-            // Call DatabaseManager to save the exercise
-            DatabaseManager.addExercise(
+            // Always add to database first
+            var newExerciseId = DatabaseManager.addExercise(
                 root.currentUserId,
-                name,
-                reps,
-                series,
-                weight,
-                grip,
-                notes
-            )
+                name, reps, series, weight, grip, notes)
+
+            if (newExerciseId < 0) {
+                    console.error("Failed to add exercise to database")
+                    return
+                }
+                console.log("Exercise added with ID:", newExerciseId)
+
+                if (calledFromSeance) {
+                    calledFromSeance = false
+                    addSeancePopup.visible = true
+
+                    addSeancePopup.addExercise({
+                        id: newExerciseId,
+                        nombre: name,
+                        repeticiones: reps,
+                        series: series,
+                        peso: weight,
+                        grip: grip,
+                        notas: notes || ""
+                    })
+                }
+        }
+
+        onCancelled: {
+            // If it was called from the seance, show it again.
+            if (calledFromSeance) {
+                calledFromSeance = false
+                addSeancePopup.visible = true
+            }
+            console.log("Exercise creation cancelled")
+        }
+    }
+
+    // Pop-up to add seance
+    ItemsExercise.AddSeancePopup {
+        id: addSeancePopup
+        anchors.fill: parent
+
+        onAddExerciseRequested: {
+            // Hide the seance pop-up and open the exercise pop-up.
+            addSeancePopup.visible = false
+            addExercisePopup.calledFromSeance = true
+            addExercisePopup.show()
+        }
+
+        onAddExerciseFromListRequested: {
+            addSeancePopup.visible = false
+            selectExercisePopup.show()
+        }
+
+        onSeanceAdded: function(name, exercises, warmUp, notes) {
+            console.log("Seance added for userId:", root.currentUserId)
+            console.log("data:", name, exercises, warmUp, notes)
+
+            if (root.currentUserId <= 0) {
+                console.error("Error: userId not valid:", root.currentUserId)
+                return
+            }
+
+            // Convert array of IDs to string "1,5,12"
+            var exercisesString = exercises.join(",")
+
+            DatabaseManager.addSeance(
+                root.currentUserId, name, exercisesString, warmUp, notes )
+        }
+
+        onSeanceUpdated: function(seanceId, name, exercises, warmUp, notes) {
+            console.log("Seance edited, id:", seanceId)
+            console.log("data:", name, exercises, warmUp, notes)
+
+            // Convert array of IDs to string "1,5,12"
+            var exercisesString = exercises.join(",")
+
+            DatabaseManager.updateSeance(
+                seanceId, name, exercisesString, warmUp, notes )
         }
 
         onCancelled: {
@@ -465,6 +568,22 @@ Rectangle {
 
         onCancelled: {
             console.log("Note creation cancelled")
+        }
+    }
+
+    // Pop-up to select exercise from list
+    ItemsExercise.SelectExercisePopup {
+        id: selectExercisePopup
+        anchors.fill: parent
+        userId: root.currentUserId
+
+        onExerciseSelected: function(exercise) {
+            addSeancePopup.visible = true
+            addSeancePopup.addExercise(exercise)
+        }
+
+        onCancelled: {
+            addSeancePopup.visible = true
         }
     }
 
