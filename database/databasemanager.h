@@ -19,12 +19,20 @@ public:
     Q_INVOKABLE bool userExists(const QString &username);
     Q_INVOKABLE int getUserId(const QString &username);
     
-    // Methods callable from QML - Exercises
+    // Methods callable from QML - Exercises (Templates & Variations)
+    Q_INVOKABLE int addExerciseTemplate(int userId, const QString &name);
+    Q_INVOKABLE int addExerciseVariation(int userId, int parentId, const QString &name,
+                                         const QString &repetitions, int series,
+                                         double weight, const QString &grip, const QString &notes);
+    Q_INVOKABLE QVariantList getExerciseTemplates(int userId);
+    Q_INVOKABLE QVariantList getExerciseVariations(int parentId);
+
+    // Legacy methods (kept for backward compatibility)
     Q_INVOKABLE bool addExercise(int userId, const QString &name, const QString &repetitions,
                                   int series, double weight, const QString &grip, const QString &notes);
     Q_INVOKABLE QVariantList getExercisesByUser(int userId);
     Q_INVOKABLE bool deleteExercise(int exerciseId);
-    Q_INVOKABLE bool updateExercise(int exerciseId, const QString &name, const QString &repetitions, 
+    Q_INVOKABLE bool updateExercise(int exerciseId, const QString &name, const QString &repetitions,
                                      int series, double weight, const QString &grip, const QString &notes);
 
     // Methods callable from QML - Seance

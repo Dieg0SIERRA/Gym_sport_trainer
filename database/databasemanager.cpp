@@ -251,6 +251,87 @@ bool DatabaseManager::createTables()
 
 // ========== Functions for exercise actions ==========
 
+// Add Exercise Template (base exercise without specific attributes)
+int DatabaseManager::addExerciseTemplate(int userId, const QString &name)
+{
+    if (name.trimmed().isEmpty()) {
+        emit exerciseAdded(false, "Exercise name is required");
+        return -1;
+    }
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        INSERT INTO exercises (user_id, exercise_name, is_template, parent_exercise_id)
+        VALUES (:user_id, :name, 1, NULL)
+    )");
+
+    query.bindValue(":user_id", userId);
+    query.bindValue(":name", name);
+
+    if (!query.exec()) {
+        qWarning() << "Error adding exercise template:" << query.lastError().text();
+        emit exerciseAdded(false, "Error saving exercise template");
+        return -1;
+    }
+
+    int newTemplateId = query.lastInsertId().toInt();
+
+    qDebug() << "Exercise template added successfully:" << name
+             << "for user_id:" << userId
+             << "with ID:" << newTemplateId;
+
+    emit exerciseAdded(true, "Exercise template added successfully");
+    return newTemplateId;
+}
+
+// Add Exercise Variation (specific configuration of a template)
+int DatabaseManager::addExerciseVariation(int userId, int parentId, const QString &name,
+                                          const QString &repetitions, int series,
+                                          double weight, const QString &grip, const QString &notes)
+{
+    if (repetitions.trimmed().isEmpty()) {
+        emit exerciseAdded(false, "Repetitions are required");
+        return -1;
+    }
+
+    if (series <= 0 || weight < 0) {
+        emit exerciseAdded(false, "Series and weight must be valid values");
+        return -1;
+    }
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        INSERT INTO exercises (user_id, exercise_name, parent_exercise_id, is_template,
+                               repetitions, series, weight, grip, notes)
+        VALUES (:user_id, :name, :parent_id, 0, :reps, :series, :weight, :grip, :notes)
+    )");
+
+    query.bindValue(":user_id", userId);
+    query.bindValue(":name", name);
+    query.bindValue(":parent_id", parentId);
+    query.bindValue(":reps", repetitions);
+    query.bindValue(":series", series);
+    query.bindValue(":weight", weight);
+    query.bindValue(":grip", grip);
+    query.bindValue(":notes", notes);
+
+    if (!query.exec()) {
+        qWarning() << "Error adding exercise variation:" << query.lastError().text();
+        emit exerciseAdded(false, "Error saving exercise variation");
+        return -1;
+    }
+
+    int newVariationId = query.lastInsertId().toInt();
+
+    qDebug() << "Exercise variation added successfully:" << name
+             << "for template ID:" << parentId
+             << "with variation ID:" << newVariationId;
+
+    emit exerciseAdded(true, "Exercise variation added successfully");
+    return newVariationId;
+}
+
+// Legacy function kept for backward compatibility
 bool DatabaseManager::addExercise(int userId, const QString &name, const QString &repetitions,
                                   int series, double weight, const QString &grip, const QString &notes)
 {
@@ -295,6 +376,89 @@ bool DatabaseManager::addExercise(int userId, const QString &name, const QString
     return newExerciseId;
 }
 
+// Get only Exercise Templates (is_template = true)
+QVariantList DatabaseManager::getExerciseTemplates(int userId)
+{
+    QVariantList templates;
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        SELECT id, exercise_name, created_at
+        FROM exercises
+        WHERE user_id = :user_id AND is_template = 1
+        ORDER BY exercise_name ASC
+    )");
+    query.bindValue(":user_id", userId);
+
+    if (!query.exec()) {
+        qWarning() << "Error getting exercise templates:" << query.lastError().text();
+        return templates;
+    }
+
+    while (query.next()) {
+        QVariantMap template_;
+        template_["id"] = query.value(0).toInt();
+        template_["name"] = query.value(1).toString();
+        template_["created_at"] = query.value(2).toString();
+
+        // Count variations for this template
+        int templateId = query.value(0).toInt();
+        QSqlQuery countQuery(m_database);
+        countQuery.prepare("SELECT COUNT(*) FROM exercises WHERE parent_exercise_id = :parent_id");
+        countQuery.bindValue(":parent_id", templateId);
+
+        if (countQuery.exec() && countQuery.next()) {
+            template_["variation_count"] = countQuery.value(0).toInt();
+        } else {
+            template_["variation_count"] = 0;
+        }
+
+        templates.append(template_);
+    }
+
+    qDebug() << "Exercise templates obtained:" << templates.size() << "for user_id:" << userId;
+    return templates;
+}
+
+// Get Exercise Variations for a specific template
+QVariantList DatabaseManager::getExerciseVariations(int parentId)
+{
+    QVariantList variations;
+
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        SELECT id, exercise_name, repetitions, series, weight, grip, notes, created_at
+        FROM exercises
+        WHERE parent_exercise_id = :parent_id
+        ORDER BY created_at DESC
+    )");
+    query.bindValue(":parent_id", parentId);
+
+    if (!query.exec()) {
+        qWarning() << "Error getting exercise variations:" << query.lastError().text();
+        return variations;
+    }
+
+    while (query.next()) {
+        QVariantMap variation;
+        variation["id"] = query.value(0).toInt();
+        variation["name"] = query.value(1).toString();
+        variation["repetitions"] = query.value(2).toString();
+        variation["series"] = query.value(3).toInt();
+        variation["weight"] = query.value(4).toDouble();
+        variation["grip"] = query.value(5).toString();
+        variation["notes"] = query.value(6).toString();
+        variation["created_at"] = query.value(7).toString();
+        variation["parent_id"] = parentId;
+
+        variations.append(variation);
+    }
+
+    qDebug() << "Exercise variations obtained:" << variations.size() << "for parent_id:" << parentId;
+    return variations;
+}
+
+// Legacy function - returns all exercises (templates + variations)
 QVariantList DatabaseManager::getExercisesByUser(int userId)
 {
     QVariantList exercises;
