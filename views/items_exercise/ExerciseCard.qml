@@ -32,17 +32,6 @@ Rectangle {
     Behavior on height {
         NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
     }
-    
-    // Sombra
-    MultiEffect {
-            anchors.fill: parent
-            source: parent
-            shadowEnabled: true
-            shadowColor: Qt.rgba(0, 0, 0, 0.2)
-            shadowBlur: 0.3
-            shadowHorizontalOffset: 0
-            shadowVerticalOffset: 6
-        }
 
     MouseArea {
         anchors.fill: parent
@@ -199,13 +188,15 @@ Rectangle {
                     elide: Text.ElideRight
                 }
             }
-            
-            // Buttons
+
+            // Buttons (they are desables for the moment)
             RowLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: 5
                 spacing: 10
-                
+                visible: false
+                enabled: false
+
                 Item { Layout.fillWidth: true }
 
                 // Edit button
@@ -222,7 +213,7 @@ Rectangle {
                         mouse.accepted = true
                     }
                 }
-                
+
                 // Delete button
                 Components.GenericButton {
                     Layout.alignment: Qt.AlignLeft
