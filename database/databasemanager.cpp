@@ -181,19 +181,22 @@ bool DatabaseManager::createTables()
 
     qDebug() << "'users' table successfully verified/created";
 
-    // Creating exercises table
+    // Creating exercises table with template/variation support
     QString createExercisesTable = R"(
         CREATE TABLE IF NOT EXISTS exercises (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             exercise_name TEXT NOT NULL,
-            repetitions TEXT NOT NULL,
-            series INTEGER NOT NULL,
-            weight REAL NOT NULL,
-            grip TEXT NOT NULL,
+            parent_exercise_id INTEGER,
+            is_template BOOLEAN DEFAULT 0,
+            repetitions TEXT,
+            series INTEGER,
+            weight REAL,
+            grip TEXT,
             notes TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (parent_exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
         )
     )";
 
@@ -298,7 +301,8 @@ QVariantList DatabaseManager::getExercisesByUser(int userId)
 
     QSqlQuery query(m_database);
     query.prepare(R"(
-        SELECT id, exercise_name, repetitions, series, weight, grip, notes, created_at
+        SELECT id, exercise_name, repetitions, series, weight, grip, notes, created_at,
+               parent_exercise_id, is_template
         FROM exercises
         WHERE user_id = :user_id
         ORDER BY created_at DESC
@@ -320,6 +324,8 @@ QVariantList DatabaseManager::getExercisesByUser(int userId)
         exercise["grip"] = query.value(5).toString();
         exercise["notes"] = query.value(6).toString();
         exercise["created_at"] = query.value(7).toString();
+        exercise["parent_id"] = query.value(8).isNull() ? -1 : query.value(8).toInt();
+        exercise["is_template"] = query.value(9).toBool();
 
         exercises.append(exercise);
     }
@@ -330,6 +336,19 @@ QVariantList DatabaseManager::getExercisesByUser(int userId)
 
 bool DatabaseManager::deleteExercise(int exerciseId)
 {
+    // Check if this is a template with variations
+    QSqlQuery checkQuery(m_database);
+    checkQuery.prepare("SELECT COUNT(*) FROM exercises WHERE parent_exercise_id = :id");
+    checkQuery.bindValue(":id", exerciseId);
+
+    if (checkQuery.exec() && checkQuery.next()) {
+        int variationCount = checkQuery.value(0).toInt();
+        if (variationCount > 0) {
+            qDebug() << "Deleting template with" << variationCount << "variations (cascade delete)";
+        }
+    }
+
+    // Delete exercise (CASCADE will automatically delete variations if it's a template)
     QSqlQuery query(m_database);
     query.prepare("DELETE FROM exercises WHERE id = :id");
     query.bindValue(":id", exerciseId);
