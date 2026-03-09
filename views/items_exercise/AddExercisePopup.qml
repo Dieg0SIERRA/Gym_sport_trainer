@@ -10,6 +10,11 @@ Rectangle {
     visible: false
     z: 1000
 
+    // Edit mode properties for creating variations
+    property bool editMode: false              // true = creating variation from existing template
+    property int templateId: -1                // Template ID when editMode = true
+    property string fixedTemplateName: ""      // Fixed template name when editMode = true
+
     signal exerciseAdded(string name, string reps, int series, real weight, string grip, string notes)
     signal cancelled()
 
@@ -44,7 +49,7 @@ Rectangle {
             // Title
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "🏋️ Add New Exercise"
+                text: root.editMode ? "✏️ Create Variation" : "🏋️ Add New Exercise"
                 color: "#ffffff"
                 font.pixelSize: 24
                 font.weight: Font.Bold
@@ -77,10 +82,10 @@ Rectangle {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 45
-                    color: "#1a1a1a"
+                    color: root.editMode ? "#0d0d0d" : "#1a1a1a"
                     radius: 8
                     border.width: exerciseNameField.activeFocus ? 2 : 1
-                    border.color: exerciseNameField.activeFocus ? "#6C63FF" : "#404040"
+                    border.color: root.editMode ? "#2a2a2a" : (exerciseNameField.activeFocus ? "#6C63FF" : "#404040")
 
                     TextField {
                         id: exerciseNameField
@@ -88,10 +93,12 @@ Rectangle {
                         anchors.margins: 10
                         placeholderText: "e.g., Bench Press"
                         placeholderTextColor: "#666666"
-                        color: "#ffffff"
+                        color: root.editMode ? "#7f8c8d" : "#ffffff"
                         background: Item {}
                         font.pixelSize: 14
-                        selectByMouse: true
+                        selectByMouse: !root.editMode
+                        readOnly: root.editMode
+                        enabled: !root.editMode
                     }
                 }
 
@@ -345,7 +352,7 @@ Rectangle {
                     }
                 }
 
-                // Button Add Exercise
+                // Button Add Exercise / Create Variation
                 Rectangle {
                     Layout.preferredWidth: 150
                     Layout.preferredHeight: 45
@@ -357,7 +364,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "Add Exercise"
+                        text: root.editMode ? "Create Variation" : "Add Exercise"
                         color: "#ffffff"
                         font.pixelSize: 16
                         font.weight: Font.DemiBold
@@ -372,14 +379,7 @@ Rectangle {
 
                         onClicked: {
                             if (isFormValid()) {
-                                root.exerciseAdded(
-                                    exerciseNameField.text,
-                                    repsField.text,
-                                    parseInt(seriesField.text),
-                                    parseFloat(weightField.text),
-                                    gripCombo.currentText,
-                                    notesArea.text
-                                )
+                                handleSave()
                                 clearFields()
                                 root.visible = false
                             }
@@ -404,10 +404,50 @@ Rectangle {
         weightField.text = ""
         gripCombo.currentIndex = 0
         notesArea.text = ""
+        root.editMode = false
+        root.templateId = -1
+        root.fixedTemplateName = ""
     }
 
     function show() {
         clearFields()
         root.visible = true
+    }
+
+    // New function: Show popup in variation creation mode
+    function showForVariation(templateIdParam, templateName, baseVariation) {
+        clearFields()
+
+        root.editMode = true
+        root.templateId = templateIdParam
+        root.fixedTemplateName = templateName
+
+        // Pre-fill fields with base variation data
+        exerciseNameField.text = templateName
+        repsField.text = baseVariation.repetitions || ""
+        seriesField.text = baseVariation.series ? baseVariation.series.toString() : ""
+        weightField.text = baseVariation.weight ? baseVariation.weight.toString() : ""
+
+        // Set grip combo box
+        var gripOptions = ["Prono", "Supino", "Neutro", "Mixto"]
+        var gripIndex = gripOptions.indexOf(baseVariation.grip)
+        gripCombo.currentIndex = gripIndex >= 0 ? gripIndex : 0
+
+        notesArea.text = baseVariation.notes || ""
+
+        root.visible = true
+    }
+
+    // Handle save logic (template + variation OR just variation)
+    function handleSave() {
+        var name = exerciseNameField.text
+        var reps = repsField.text
+        var series = parseInt(seriesField.text)
+        var weight = parseFloat(weightField.text)
+        var grip = gripCombo.currentText
+        var notes = notesArea.text
+
+        // Emit signal for Dashboard to handle
+        root.exerciseAdded(name, reps, series, weight, grip, notes)
     }
 }
