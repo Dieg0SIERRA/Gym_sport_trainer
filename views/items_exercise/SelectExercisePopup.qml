@@ -13,7 +13,8 @@ Rectangle {
     property int userId: -1
     property var exercises: []
 
-    signal exerciseSelected(var exercise)
+    signal exerciseSelected(var exercise)  // Legacy signal (kept for compatibility)
+    signal templateSelectedForVariation(int templateId, string templateName, var firstVariation)
     signal cancelled()
 
     MouseArea {
@@ -46,7 +47,7 @@ Rectangle {
             // Title
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "📋 Select Exercise"
+                text: "📋 Select Exercise Template"
                 color: "#ffffff"
                 font.pixelSize: 22
                 font.weight: Font.Bold
@@ -147,7 +148,8 @@ Rectangle {
                                 }
 
                                 Text {
-                                    text: model.repetitions + " · " + model.weight + " kg · " + model.grip
+                                    text: (model.variation_count || 0) + " variation" +
+                                          (model.variation_count === 1 ? "" : "s")
                                     color: "#7f8c8d"
                                     font.pixelSize: 12
                                     elide: Text.ElideRight
@@ -169,17 +171,7 @@ Rectangle {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                var exercise = {
-                                    id: model.id,
-                                    nombre: model.name,
-                                    repeticiones: model.repetitions,
-                                    series: model.series,
-                                    peso: model.weight,
-                                    grip: model.grip,
-                                    notas: model.notes || ""
-                                }
-                                root.exerciseSelected(exercise)
-                                root.visible = false
+                                handleTemplateSelection(model.id, model.name)
                             }
                         }
                     }
@@ -216,7 +208,9 @@ Rectangle {
 
     function loadExercises() {
         if (root.userId <= 0) return
-        root.exercises = DatabaseManager.getExercisesByUser(root.userId)
+        // Load templates instead of all exercises
+        root.exercises = DatabaseManager.getExerciseTemplates(root.userId)
+        console.log("Loaded templates:", root.exercises.length)
         filterExercises()
     }
 
@@ -225,14 +219,33 @@ Rectangle {
         var searchText = searchField.text.toLowerCase()
 
         for (var i = 0; i < root.exercises.length; i++) {
-            var ex = root.exercises[i]
+            var template = root.exercises[i]
             if (searchText !== "") {
-                if (!ex.name.toLowerCase().includes(searchText) &&
-                    !ex.grip.toLowerCase().includes(searchText)) {
+                if (!template.name.toLowerCase().includes(searchText)) {
                     continue
                 }
             }
-            filteredModel.append(ex)
+            filteredModel.append(template)
         }
+    }
+
+    function handleTemplateSelection(templateId, templateName) {
+        console.log("Template selected:", templateId, templateName)
+
+        // Get first variation of this template
+        var variations = DatabaseManager.getExerciseVariations(templateId)
+
+        if (variations.length === 0) {
+            console.warn("Template has no variations:", templateName)
+            // Could show error message or create first variation
+            return
+        }
+
+        var firstVariation = variations[0]
+        console.log("First variation:", JSON.stringify(firstVariation))
+
+        // Emit signal with template info and first variation
+        root.templateSelectedForVariation(templateId, templateName, firstVariation)
+        root.visible = false
     }
 }
