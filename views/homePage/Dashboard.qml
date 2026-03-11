@@ -463,31 +463,62 @@ Rectangle {
                 return
             }
 
-            // Always add to database first
-            var newExerciseId = DatabaseManager.addExercise(
-                root.currentUserId,
-                name, reps, series, weight, grip, notes)
+            var newVariationId = -1
 
-            if (newExerciseId < 0) {
-                    console.error("Failed to add exercise to database")
+            // Check if we're in edit mode (creating variation) or normal mode (creating template + first variation)
+            if (addExercisePopup.editMode) {
+                // Creating variation for existing template
+                console.log("Creating variation for template:", addExercisePopup.templateId)
+
+                newVariationId = DatabaseManager.addExerciseVariation(
+                    root.currentUserId,
+                    addExercisePopup.templateId,
+                    name, reps, series, weight, grip, notes)
+
+                if (newVariationId < 0) {
+                    console.error("Failed to create variation")
                     return
                 }
-                console.log("Exercise added with ID:", newExerciseId)
+                console.log("Variation created with ID:", newVariationId)
+            } else {
+                // Creating new template + first variation
+                console.log("Creating new template + first variation")
 
-                if (calledFromSeance) {
-                    calledFromSeance = false
-                    addSeancePopup.visible = true
+                var templateId = DatabaseManager.addExerciseTemplate(root.currentUserId, name)
 
-                    addSeancePopup.addExercise({
-                        id: newExerciseId,
-                        nombre: name,
-                        repeticiones: reps,
-                        series: series,
-                        peso: weight,
-                        grip: grip,
-                        notas: notes || ""
-                    })
+                if (templateId < 0) {
+                    console.error("Failed to create template")
+                    return
                 }
+                console.log("Template created with ID:", templateId)
+
+                newVariationId = DatabaseManager.addExerciseVariation(
+                    root.currentUserId,
+                    templateId,
+                    name, reps, series, weight, grip, notes)
+
+                if (newVariationId < 0) {
+                    console.error("Failed to create first variation")
+                    return
+                }
+                console.log("First variation created with ID:", newVariationId)
+            }
+
+            // If called from seance, add the variation to the seance
+            if (calledFromSeance) {
+                calledFromSeance = false
+                addSeancePopup.visible = true
+
+                addSeancePopup.addExercise({
+                    id: newVariationId,
+                    nombre: name,
+                    repeticiones: reps,
+                    series: series,
+                    peso: weight,
+                    grip: grip,
+                    notas: notes || ""
+                })
+            }
         }
 
         onCancelled: {
@@ -577,9 +608,19 @@ Rectangle {
         anchors.fill: parent
         userId: root.currentUserId
 
+        // Legacy signal handler (kept for compatibility)
         onExerciseSelected: function(exercise) {
             addSeancePopup.visible = true
             addSeancePopup.addExercise(exercise)
+        }
+
+        // New handler: Template selected, open AddExercisePopup in edit mode
+        onTemplateSelectedForVariation: function(templateId, templateName, firstVariation) {
+            console.log("Opening variation editor for template:", templateName)
+
+            // Open AddExercisePopup in edit mode with pre-filled data
+            addExercisePopup.calledFromSeance = true
+            addExercisePopup.showForVariation(templateId, templateName, firstVariation)
         }
 
         onCancelled: {
