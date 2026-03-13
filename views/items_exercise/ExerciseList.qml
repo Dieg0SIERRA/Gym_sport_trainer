@@ -185,6 +185,59 @@ Rectangle {
                             }
                             cursorShape: Qt.PointingHandCursor
                         }
+
+                        ColumnLayout {
+                            id: contentColumn
+                            anchors.fill: parent
+                            anchors.margins: 20
+                            spacing: 12
+
+                            // Header - Template info
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 15
+
+                                Rectangle {
+                                    Layout.preferredWidth: 50
+                                    Layout.preferredHeight: 50
+                                    color: "#1E90FF"
+                                    radius: 25
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "📦"
+                                        font.pixelSize: 24
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 4
+
+                                    Text {
+                                        text: model.name
+                                        font.pixelSize: 18
+                                        font.weight: Font.Bold
+                                        color: "#2c3e50"
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
+
+                                    Text {
+                                        text: (model.variation_count || 0) + " variation" +
+                                              (model.variation_count === 1 ? "" : "s")
+                                        font.pixelSize: 14
+                                        color: "#7f8c8d"
+                                    }
+                                }
+
+                                Text {
+                                    text: templateCard.expanded ? "▲" : "▼"
+                                    font.pixelSize: 16
+                                    color: "#1E90FF"
+                                }
+                            }
+
                         }
                     }
                 }
