@@ -159,24 +159,32 @@ Rectangle {
                     spacing: 15
                     model: filteredModel
                     
-                    delegate: ExerciseCard {
+                    delegate: Rectangle {
+                        id: templateCard
                         width: exerciseListView.width
-                        exerciseId: model.id
-                        exerciseName: model.name
-                        repetitions: model.repetitions
-                        series: model.series
-                        weight: model.weight
-                        grip: model.grip
-                        notes: model.notes
-                        createdAt: model.created_at
-                        
-                        onEditClicked: function(id) {
-                            root.editExercise(id)
+                        height: expanded ? Math.max(contentColumn.implicitHeight + 40, 180) : 100
+                        color: "#ffffff"
+                        radius: 15
+                        border.color: "#e0e0e0"
+                        border.width: 1
+
+                        property bool expanded: false
+                        property var variations: []
+
+                        Behavior on height {
+                            NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
                         }
-                        
-                        onDeleteClicked: function(id) {
-                            deleteConfirmDialog.exerciseIdToDelete = id
-                            deleteConfirmDialog.visible = true
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (!templateCard.expanded) {
+                                    loadVariations()
+                                }
+                                templateCard.expanded = !templateCard.expanded
+                            }
+                            cursorShape: Qt.PointingHandCursor
+                        }
                         }
                     }
                 }
@@ -347,5 +355,11 @@ Rectangle {
     // Public function for recharging from outside
     function refresh() {
         loadExercises()
+    }
+    
+    function loadVariations() {
+        console.log("Loading variations for template:", model.id)
+        templateCard.variations = DatabaseManager.getExerciseVariations(model.id)
+        console.log("Loaded variations:", templateCard.variations.length)
     }
 }
