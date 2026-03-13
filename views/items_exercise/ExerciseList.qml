@@ -315,9 +315,9 @@ Rectangle {
             return
         }
 
-        console.log("Loading exercises for userId:", root.userId)
-        root.exercises = DatabaseManager.getExercisesByUser(root.userId)
-        console.log("Loaded exercises:", root.exercises.length)
+        console.log("Loading exercise templates for userId:", root.userId)
+        root.exercises = DatabaseManager.getExerciseTemplates(root.userId)
+        console.log("Loaded templates:", root.exercises.length)
         filterExercises()
     }
 
