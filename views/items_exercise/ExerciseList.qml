@@ -13,6 +13,7 @@ Rectangle {
     signal refreshRequested()
     signal editExercise(int exerciseId)
     signal deleteExercise(int exerciseId)
+    signal addVariationRequested(int templateId, string templateName, var firstVariation)
 
     onUserIdChanged: {
         if (userId > 0) {
@@ -238,6 +239,207 @@ Rectangle {
                                 }
                             }
 
+                            // Variations list (visible when expanded)
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: 10
+                                visible: templateCard.expanded
+                                opacity: templateCard.expanded ? 1.0 : 0.0
+
+                                Behavior on opacity {
+                                    NumberAnimation { duration: 200 }
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 1
+                                    color: "#e0e0e0"
+                                }
+
+                                Text {
+                                    text: "Variations:"
+                                    font.pixelSize: 14
+                                    font.weight: Font.Bold
+                                    color: "#2c3e50"
+                                    visible: templateCard.variations.length > 0
+                                }
+
+                                ScrollView {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.maximumHeight: 200
+                                    clip: true
+                                    visible: templateCard.variations.length > 0
+
+                                    ColumnLayout {
+                                        width: parent.width
+                                        spacing: 8
+
+                                        Repeater {
+                                            model: templateCard.variations
+
+                                            Rectangle {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: 60
+                                                color: "#f8f9fa"
+                                                radius: 8
+                                                border.color: "#e0e0e0"
+                                                border.width: 1
+
+                                                RowLayout {
+                                                    anchors.fill: parent
+                                                    anchors.margins: 10
+                                                    spacing: 15
+
+                                                    Text {
+                                                        text: "💪"
+                                                        font.pixelSize: 20
+                                                    }
+
+                                                    GridLayout {
+                                                        Layout.fillWidth: true
+                                                        columns: 4
+                                                        columnSpacing: 15
+                                                        rowSpacing: 4
+
+                                                        Text {
+                                                            text: "Reps: " + (modelData.repetitions || "-")
+                                                            font.pixelSize: 12
+                                                            color: "#34495e"
+                                                        }
+
+                                                        Text {
+                                                            text: "Sets: " + (modelData.series || "-")
+                                                            font.pixelSize: 12
+                                                            color: "#34495e"
+                                                        }
+
+                                                        Text {
+                                                            text: "Weight: " + (modelData.weight || "0") + " kg"
+                                                            font.pixelSize: 12
+                                                            color: "#34495e"
+                                                        }
+
+                                                        Text {
+                                                            text: "Grip: " + (modelData.grip || "-")
+                                                            font.pixelSize: 12
+                                                            color: "#34495e"
+                                                        }
+                                                    }
+
+                                                    Rectangle {
+                                                        Layout.preferredWidth: 30
+                                                        Layout.preferredHeight: 30
+                                                        color: deleteVariationArea.pressed ? "#c0392b" :
+                                                               deleteVariationArea.containsMouse ? "#e74c3c" : "#d04040"
+                                                        radius: 6
+
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: "🗑️"
+                                                            font.pixelSize: 14
+                                                        }
+
+                                                        MouseArea {
+                                                            id: deleteVariationArea
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onClicked: {
+                                                                deleteConfirmDialog.exerciseIdToDelete = modelData.id
+                                                                deleteConfirmDialog.visible = true
+                                                                mouse.accepted = true
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: "No variations yet"
+                                    font.pixelSize: 14
+                                    color: "#7f8c8d"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    visible: templateCard.variations.length === 0
+                                }
+
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.topMargin: 5
+                                    spacing: 10
+
+                                    Item { Layout.fillWidth: true }
+
+                                    Rectangle {
+                                        Layout.preferredWidth: 140
+                                        Layout.preferredHeight: 35
+                                        color: addVariationArea.pressed ? "#5A52E8" :
+                                               addVariationArea.containsMouse ? "#7B73FF" : "#6C63FF"
+                                        radius: 8
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "+ Add variation"
+                                            color: "#ffffff"
+                                            font.pixelSize: 13
+                                            font.weight: Font.Medium
+                                        }
+
+                                        MouseArea {
+                                            id: addVariationArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                console.log("Add variation for template:", model.id, model.name)
+
+                                                // Get first variation to pre-fill data
+                                                if (templateCard.variations.length > 0) {
+                                                    var firstVariation = templateCard.variations[0]
+                                                    root.addVariationRequested(model.id, model.name, firstVariation)
+                                                } else {
+                                                    console.warn("No variations found for template:", model.name)
+                                                }
+
+                                                mouse.accepted = true
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        Layout.preferredWidth: 130
+                                        Layout.preferredHeight: 35
+                                        color: deleteTemplateArea.pressed ? "#c0392b" :
+                                               deleteTemplateArea.containsMouse ? "#e74c3c" : "#d04040"
+                                        radius: 8
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "🗑️ Delete template"
+                                            color: "#ffffff"
+                                            font.pixelSize: 13
+                                            font.weight: Font.Medium
+                                        }
+
+                                        MouseArea {
+                                            id: deleteTemplateArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                deleteConfirmDialog.exerciseIdToDelete = model.id
+                                                deleteConfirmDialog.visible = true
+                                                mouse.accepted = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
