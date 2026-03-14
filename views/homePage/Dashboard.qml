@@ -362,6 +362,11 @@ Rectangle {
                 addExercisePopup.calledFromSeance = false  // Not from seance, just creating variation
                 addExercisePopup.showForVariation(templateId, templateName, firstVariation)
             }
+
+            onShowStatsRequested: function(templateId, templateName) {
+                console.log("Opening stats for template:", templateName)
+                exerciseStatsPopup.show(templateId, templateName)
+            }
         }
     }
 
@@ -633,6 +638,16 @@ Rectangle {
 
         onCancelled: {
             addSeancePopup.visible = true
+        }
+    }
+
+    // Pop-up to show exercise statistics
+    ItemsExercise.ExerciseStatsPopup {
+        id: exerciseStatsPopup
+        anchors.fill: parent
+
+        onCancelled: {
+            console.log("Stats popup closed")
         }
     }
 
