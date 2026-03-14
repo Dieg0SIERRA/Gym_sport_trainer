@@ -36,6 +36,7 @@ qt_add_qml_module(appGymTracker URI GymTracker VERSION 1.0
         views/items_exercise/SeanceCard.qml
         views/items_exercise/SeanceList.qml
         views/items_exercise/SelectExercisePopup.qml
+        views/items_exercise/ExerciseStatsPopup.qml
         views/calendar/NotePopUp.qml
         views/calendar/CalendarWidget.qml
 )
