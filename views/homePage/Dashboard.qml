@@ -354,6 +354,14 @@ Rectangle {
                 console.log("Delete exercise:", exerciseId)
                 DatabaseManager.deleteExercise(exerciseId)
             }
+
+            onAddVariationRequested: function(templateId, templateName, firstVariation) {
+                console.log("Opening variation editor from ExerciseList for:", templateName)
+
+                // Open AddExercisePopup in edit mode with pre-filled data
+                addExercisePopup.calledFromSeance = false  // Not from seance, just creating variation
+                addExercisePopup.showForVariation(templateId, templateName, firstVariation)
+            }
         }
     }
 
