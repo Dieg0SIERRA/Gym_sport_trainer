@@ -14,6 +14,7 @@ Rectangle {
     signal editExercise(int exerciseId)
     signal deleteExercise(int exerciseId)
     signal addVariationRequested(int templateId, string templateName, var firstVariation)
+    signal showStatsRequested(int templateId, string templateName)
 
     onUserIdChanged: {
         if (userId > 0) {
@@ -374,6 +375,34 @@ Rectangle {
                                     spacing: 10
 
                                     Item { Layout.fillWidth: true }
+
+                                    Rectangle {
+                                        Layout.preferredWidth: 100
+                                        Layout.preferredHeight: 35
+                                        color: statsArea.pressed ? "#218838" :
+                                               statsArea.containsMouse ? "#28a745" : "#27ae60"
+                                        radius: 8
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "📈 Stats"
+                                            color: "#ffffff"
+                                            font.pixelSize: 13
+                                            font.weight: Font.Medium
+                                        }
+
+                                        MouseArea {
+                                            id: statsArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                console.log("Show stats for template:", model.id, model.name)
+                                                root.showStatsRequested(model.id, model.name)
+                                                mouse.accepted = true
+                                            }
+                                        }
+                                    }
 
                                     Rectangle {
                                         Layout.preferredWidth: 140
