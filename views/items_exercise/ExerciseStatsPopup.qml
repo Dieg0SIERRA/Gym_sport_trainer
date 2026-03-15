@@ -129,6 +129,15 @@ Rectangle {
                 }
             }
 
+            // History section
+            Text {
+                text: "History"
+                color: "#6C63FF"
+                font.pixelSize: 14
+                font.weight: Font.Bold
+                Layout.topMargin: 5
+            }
+
             // Empty state
             Text {
                 Layout.fillWidth: true
@@ -138,6 +147,113 @@ Rectangle {
                 color: "#7f8c8d"
                 font.pixelSize: 16
                 horizontalAlignment: Text.AlignHCenter
+            }
+
+            // Variations list
+            ScrollView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                visible: root.variations.length > 0
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                ListView {
+                    id: variationsListView
+                    anchors.fill: parent
+                    spacing: 10
+                    model: root.variations
+
+                    delegate: Rectangle {
+                        width: variationsListView.width
+                        height: 90
+                        radius: 10
+                        color: "#1a1a1a"
+                        border.width: 1
+                        border.color: "#404040"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 12
+
+                            // Status indicator
+                            Rectangle {
+                                Layout.preferredWidth: 8
+                                Layout.preferredHeight: 60
+                                radius: 4
+                                color: getVariationColor(index)
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 6
+
+                                // Date
+                                Text {
+                                    text: formatDate(modelData.created_at) +
+                                          (index === root.variations.length - 1 ? " (first)" :
+                                           index === 0 ? " (latest)" : "")
+                                    color: "#ffffff"
+                                    font.pixelSize: 14
+                                    font.weight: Font.Medium
+                                }
+
+                                // Stats
+                                RowLayout {
+                                    spacing: 15
+
+                                    Text {
+                                        text: modelData.weight + " kg"
+                                        color: "#6C63FF"
+                                        font.pixelSize: 13
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        text: "•"
+                                        color: "#404040"
+                                    }
+
+                                    Text {
+                                        text: modelData.repetitions
+                                        color: "#b0b0b0"
+                                        font.pixelSize: 12
+                                    }
+
+                                    Text {
+                                        text: "•"
+                                        color: "#404040"
+                                    }
+
+                                    Text {
+                                        text: modelData.series + " sets"
+                                        color: "#b0b0b0"
+                                        font.pixelSize: 12
+                                    }
+
+                                    Text {
+                                        text: "•"
+                                        color: "#404040"
+                                    }
+
+                                    Text {
+                                        text: modelData.grip
+                                        color: "#b0b0b0"
+                                        font.pixelSize: 12
+                                    }
+                                }
+
+                                // Progress indicator
+                                Text {
+                                    text: getProgressIndicator(index)
+                                    color: getProgressIndicatorColor(index)
+                                    font.pixelSize: 12
+                                    visible: index < root.variations.length - 1
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // Close button
@@ -209,7 +325,37 @@ Rectangle {
 
         return diff > 0 ? "#27ae60" : diff < 0 ? "#e74c3c" : "#7f8c8d"
     }
-    
+
+    function getVariationColor(index) {
+        if (index === 0) return "#27ae60"  // Latest - green
+        if (index === root.variations.length - 1) return "#95a5a6"  // First - gray
+        return "#3498db"  // Middle - blue
+    }
+
+    function getProgressIndicator(index) {
+        if (index >= root.variations.length - 1) return ""
+
+        var current = root.variations[index]
+        var previous = root.variations[index + 1]
+        var diff = current.weight - previous.weight
+
+        if (diff === 0) return "➡️ No change from previous"
+
+        var sign = diff > 0 ? "+" : ""
+        var arrow = diff > 0 ? "🔼" : "🔽"
+        return arrow + " " + sign + diff + " kg from previous"
+    }
+
+    function getProgressIndicatorColor(index) {
+        if (index >= root.variations.length - 1) return "#7f8c8d"
+
+        var current = root.variations[index]
+        var previous = root.variations[index + 1]
+        var diff = current.weight - previous.weight
+
+        return diff > 0 ? "#27ae60" : diff < 0 ? "#e74c3c" : "#7f8c8d"
+    }
+
     function formatDate(dateString) {
         if (!dateString) return ""
 
