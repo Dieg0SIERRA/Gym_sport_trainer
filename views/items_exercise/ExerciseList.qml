@@ -181,7 +181,9 @@ Rectangle {
                             anchors.fill: parent
                             onClicked: {
                                 if (!templateCard.expanded) {
-                                    loadVariations()
+                                    console.log("Loading variations for template:", model.id)
+                            		templateCard.variations = DatabaseManager.getExerciseVariations(model.id)
+                            		console.log("Loaded variations:", templateCard.variations.length)
                                 }
                                 templateCard.expanded = !templateCard.expanded
                             }
@@ -269,91 +271,32 @@ Rectangle {
                                 ScrollView {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.maximumHeight: 200
+                                    Layout.maximumHeight: 250
                                     clip: true
                                     visible: templateCard.variations.length > 0
 
                                     ColumnLayout {
                                         width: parent.width
-                                        spacing: 8
+                                        spacing: 10
 
                                         Repeater {
                                             model: templateCard.variations
 
-                                            Rectangle {
+                                            ExerciseCard {
                                                 Layout.fillWidth: true
-                                                Layout.preferredHeight: 60
-                                                color: "#f8f9fa"
-                                                radius: 8
-                                                border.color: "#e0e0e0"
-                                                border.width: 1
+                                                compactMode: true  // Enable compact mode for variations
+                                                exerciseId: modelData.id
+                                                exerciseName: ""  // Empty, template name already shown above
+                                                repetitions: modelData.repetitions || "-"
+                                                series: modelData.series || 0
+                                                weight: modelData.weight || 0.0
+                                                grip: modelData.grip || "-"
+                                                notes: modelData.notes || ""
+                                                createdAt: modelData.created_at || ""
 
-                                                RowLayout {
-                                                    anchors.fill: parent
-                                                    anchors.margins: 10
-                                                    spacing: 15
-
-                                                    Text {
-                                                        text: "💪"
-                                                        font.pixelSize: 20
-                                                    }
-
-                                                    GridLayout {
-                                                        Layout.fillWidth: true
-                                                        columns: 4
-                                                        columnSpacing: 15
-                                                        rowSpacing: 4
-
-                                                        Text {
-                                                            text: "Reps: " + (modelData.repetitions || "-")
-                                                            font.pixelSize: 12
-                                                            color: "#34495e"
-                                                        }
-
-                                                        Text {
-                                                            text: "Sets: " + (modelData.series || "-")
-                                                            font.pixelSize: 12
-                                                            color: "#34495e"
-                                                        }
-
-                                                        Text {
-                                                            text: "Weight: " + (modelData.weight || "0") + " kg"
-                                                            font.pixelSize: 12
-                                                            color: "#34495e"
-                                                        }
-
-                                                        Text {
-                                                            text: "Grip: " + (modelData.grip || "-")
-                                                            font.pixelSize: 12
-                                                            color: "#34495e"
-                                                        }
-                                                    }
-
-                                                    Rectangle {
-                                                        Layout.preferredWidth: 30
-                                                        Layout.preferredHeight: 30
-                                                        color: deleteVariationArea.pressed ? "#c0392b" :
-                                                               deleteVariationArea.containsMouse ? "#e74c3c" : "#d04040"
-                                                        radius: 6
-
-                                                        Text {
-                                                            anchors.centerIn: parent
-                                                            text: "🗑️"
-                                                            font.pixelSize: 14
-                                                        }
-
-                                                        MouseArea {
-                                                            id: deleteVariationArea
-                                                            anchors.fill: parent
-                                                            hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            onClicked: {
-                                                                deleteConfirmDialog.exerciseIdToDelete = modelData.id
-                                                                deleteConfirmDialog.visible = true
-                                                                mouse.accepted = true
-                                                            }
-                                                        }
-                                                    }
+                                                onDeleteClicked: function(id) {
+                                                    deleteConfirmDialog.exerciseIdToDelete = id
+                                                    deleteConfirmDialog.visible = true
                                                 }
                                             }
                                         }
