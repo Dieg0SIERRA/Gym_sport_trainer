@@ -161,6 +161,8 @@ Rectangle {
                         exerciseList: model.exerciselist
                         warmUp: model.warmup
                         notes: model.notes
+                        warmUpTime: model.warmuptime
+                        warmUpDistance: model.warmupdistance
                         createdAt: model.created_at
 
                         onEditClicked: function(id) {
