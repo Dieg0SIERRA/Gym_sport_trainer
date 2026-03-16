@@ -5,7 +5,7 @@ import "../components" as Components
 
 Rectangle {
     id: root
-    
+
     // Exercise properties
     property int exerciseId: 0
     property string exerciseName: ""
@@ -15,18 +15,21 @@ Rectangle {
     property string grip: ""
     property string notes: ""
     property string createdAt: ""
-    
+
+    // Mode properties
+    property bool compactMode: false  // New: compact mode for variations in template list
+
     // Signals
     signal editClicked(int id)
     signal deleteClicked(int id)
-    
+
     width: parent.width
-    height: expanded ? 220 : 120
-    color: "#ffffff"
-    radius: 15
+    height: compactMode ? 70 : (expanded ? 220 : 120)
+    color: compactMode ? "#f8f9fa" : "#ffffff"
+    radius: compactMode ? 8 : 15
     border.color: "#e0e0e0"
     border.width: 1
-    
+
     property bool expanded: false
     
     Behavior on height {
@@ -35,39 +38,113 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
+        enabled: !root.compactMode  // Disable expansion in compact mode
         onClicked: root.expanded = !root.expanded
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: root.compactMode ? Qt.ArrowCursor : Qt.PointingHandCursor
     }
     
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 12
-        
-        // Header
+        anchors.margins: root.compactMode ? 10 : 20
+        spacing: root.compactMode ? 6 : 12
+
+        // Header - Compact mode
         RowLayout {
             Layout.fillWidth: true
             spacing: 15
-            
+            visible: root.compactMode
+
+            Text {
+                text: "💪"
+                font.pixelSize: 20
+            }
+
+            GridLayout {
+                Layout.fillWidth: true
+                columns: 4
+                columnSpacing: 15
+                rowSpacing: 4
+
+                Text {
+                    text: "Reps: " + (root.repetitions || "-")
+                    font.pixelSize: 12
+                    color: "#34495e"
+                }
+
+                Text {
+                    text: "Sets: " + (root.series || "-")
+                    font.pixelSize: 12
+                    color: "#34495e"
+                }
+
+                Text {
+                    text: "Weight: " + (root.weight || "0") + " kg"
+                    font.pixelSize: 12
+                    color: "#34495e"
+                }
+
+                Text {
+                    text: "Grip: " + (root.grip || "-")
+                    font.pixelSize: 12
+                    color: "#34495e"
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true  // Spacer to push button to the right
+            }
+
+            Rectangle {
+                Layout.preferredWidth: 30
+                Layout.preferredHeight: 30
+                color: compactDeleteArea.pressed ? "#c0392b" :
+                       compactDeleteArea.containsMouse ? "#e74c3c" : "#d04040"
+                radius: 6
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "🗑️"
+                    font.pixelSize: 14
+                }
+
+                MouseArea {
+                    id: compactDeleteArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.deleteClicked(root.exerciseId)
+                        mouse.accepted = true
+                    }
+                }
+            }
+        }
+
+        // Header - Normal mode
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 15
+            visible: !root.compactMode
+
             // Icon
             Rectangle {
                 Layout.preferredWidth: 50
                 Layout.preferredHeight: 50
                 color: "#1E90FF"
                 radius: 25
-                
+
                 Text {
                     anchors.centerIn: parent
                     text: "💪"
                     font.pixelSize: 24
                 }
             }
-            
+
             // Main information
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 4
-                
+
                 Text {
                     text: root.exerciseName
                     font.pixelSize: 18
@@ -76,22 +153,22 @@ Rectangle {
                     elide: Text.ElideRight
                     Layout.fillWidth: true
                 }
-                
+
                 RowLayout {
                     spacing: 15
-                    
+
                     Text {
                         text: "📊 " + root.repetitions
                         font.pixelSize: 14
                         color: "#7f8c8d"
                     }
-                    
+
                     Text {
                         text: "⚖️ " + root.weight + " kg"
                         font.pixelSize: 14
                         color: "#7f8c8d"
                     }
-                    
+
                     Text {
                         text: "🤝 " + root.grip
                         font.pixelSize: 14
@@ -99,7 +176,7 @@ Rectangle {
                     }
                 }
             }
-            
+
             // Expand indicator
             Text {
                 text: root.expanded ? "▲" : "▼"
@@ -108,12 +185,12 @@ Rectangle {
             }
         }
         
-        // Details
+        // Details (only in normal mode when expanded)
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 10
-            visible: root.expanded
+            visible: !root.compactMode && root.expanded
             opacity: root.expanded ? 1.0 : 0.0
             
             Behavior on opacity {
