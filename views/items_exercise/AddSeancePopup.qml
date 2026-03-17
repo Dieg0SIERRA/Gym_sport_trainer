@@ -103,77 +103,72 @@ Rectangle {
                     font.weight: Font.Medium
                 }
 
-                Rectangle {
+                ComboBox {
+                    id: warmUpExercise
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
-                    color: "#1a1a1a"
-                    radius: 8
-                    border.width: warmUpExercise.pressed ? 2 : 1
-                    border.color: warmUpExercise.pressed ? "#6C63FF" : "#404040"
 
-                    ComboBox {
-                        id: warmUpExercise
-                        anchors.fill: parent
-                        anchors.margins: 1
+                    model: ["-------", "Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
 
-                        model: ["-------", "Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
+                    background: Rectangle {
+                        color: warmUpExercise.pressed ? "#3a3a3a" : "#1a1a1a"
+                        radius: 8
+                        border.width: warmUpExercise.pressed ? 2 : 1
+                        border.color: warmUpExercise.pressed ? "#6C63FF" : "#404040"
+                    }
+
+                    contentItem: Text {
+                        leftPadding: 10
+                        text: warmUpExercise.displayText
+                        color: "#ffffff"
+                        font.pixelSize: 14
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    indicator: Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "▼"
+                        color: "#6C63FF"
+                        font.pixelSize: 12
+                    }
+
+                    popup: Popup {
+                        y: warmUpExercise.height + 2
+                        width: warmUpExercise.width
+                        padding: 1
 
                         background: Rectangle {
-                            color: warmUpExercise.pressed ? "#3a3a3a" : "#1a1a1a"
+                            color: "#2a2a2a"
+                            border.color: "#6C63FF"
+                            border.width: 1
                             radius: 8
                         }
 
+                        contentItem: ListView {
+                            clip: true
+                            implicitHeight: contentHeight
+                            model: warmUpExercise.popup.visible ? warmUpExercise.delegateModel : null
+                            currentIndex: warmUpExercise.highlightedIndex
+                            ScrollIndicator.vertical: ScrollIndicator {}
+                        }
+                    }
+
+                    delegate: ItemDelegate {
+                        width: warmUpExercise.width
+
                         contentItem: Text {
-                            leftPadding: 10
-                            text: warmUpExercise.displayText
+                            text: modelData
                             color: "#ffffff"
                             font.pixelSize: 14
                             verticalAlignment: Text.AlignVCenter
+                            leftPadding: 10
                         }
 
-                        indicator: Text {
-                            x: warmUpExercise.width - width - 10
-                            y: warmUpExercise.height / 2 - height / 2
-                            text: "▼"
-                            color: "#6C63FF"
-                            font.pixelSize: 12
-                        }
-
-                        popup: Popup {
-                            y: warmUpExercise.height + 2
-                            width: warmUpExercise.width
-                            padding: 1
-
-                            contentItem: ListView {
-                                clip: true
-                                implicitHeight: contentHeight
-                                model: warmUpExercise.popup.visible ? warmUpExercise.delegateModel : null
-                                currentIndex: warmUpExercise.highlightedIndex
-
-                                ScrollIndicator.vertical: ScrollIndicator {}
-                            }
-
-                            background: Rectangle {
-                                color: "#2a2a2a"
-                                border.color: "#6C63FF"
-                                border.width: 1
-                                radius: 8
-                            }
-                        }
-
-                        delegate: ItemDelegate {
-                            width: warmUpExercise.width
-                            contentItem: Text {
-                                text: modelData
-                                color: "#ffffff"
-                                font.pixelSize: 14
-                                verticalAlignment: Text.AlignVCenter
-                                leftPadding: 10
-                            }
-                            background: Rectangle {
-                                color: parent.highlighted ? "#6C63FF" : "#2a2a2a"
-                                opacity: parent.highlighted ? 0.8 : 1.0
-                            }
+                        background: Rectangle {
+                            color: parent.highlighted ? "#6C63FF" : "#2a2a2a"
+                            opacity: parent.highlighted ? 0.8 : 1.0
                         }
                     }
                 }
