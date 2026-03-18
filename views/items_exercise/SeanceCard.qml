@@ -12,6 +12,8 @@ Rectangle {
     property var exerciseList: []  // Changed to var to accept array
     property string warmUp: ""
     property string notes: ""
+    property string warmUpTime: ""
+    property string warmUpDistance: ""
     property string createdAt: ""
     
     // Signals
@@ -129,7 +131,7 @@ Rectangle {
             // Information
             GridLayout {
                 Layout.fillWidth: true
-                columns: 2
+                columns: 4
                 rowSpacing: 8
                 columnSpacing: 15
                 
@@ -142,6 +144,18 @@ Rectangle {
                 
                 Text {
                     text: root.warmUp
+                    font.pixelSize: 14
+                    color: "#7f8c8d"
+                }
+
+                Text {
+                    text: "\t ⏱️ " + root.warmUpTime
+                    font.pixelSize: 14
+                    color: "#7f8c8d"
+                }
+
+                Text {
+                    text: "\t ❯❯❯❯  " + root.warmUpDistance + " 🇰🇲"
                     font.pixelSize: 14
                     color: "#7f8c8d"
                 }
