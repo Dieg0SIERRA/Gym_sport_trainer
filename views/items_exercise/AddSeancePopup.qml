@@ -11,7 +11,7 @@ Rectangle {
     visible: false
     z: 1000
 
-    signal seanceAdded(string name, var exercises, string warmUp, string notes)
+    signal seanceAdded(string name, var exercises, string warmUp, string notes, string warmUpTime, double warmUpDistance)
     signal addExerciseRequested()
     signal addExerciseFromListRequested()
     signal cancelled()
@@ -19,7 +19,7 @@ Rectangle {
     // ── Edit mode properties ──
     property bool editMode: false
     property int editSeanceId: -1
-    signal seanceUpdated(int seanceId, string name, var exercises, string warmUp, string notes)
+    signal seanceUpdated(int seanceId, string name, var exercises, string warmUp, string notes, string warmUpTime, double warmUpDistance)
 
 
     ListModel {
@@ -412,7 +412,9 @@ Rectangle {
                                 seanceNameField.text,
                                 getExercises(),
                                 warmUpExercise.currentText,
-                                notesArea.text
+                                notesArea.text,
+                                warmUpTime.text,
+                                getWarmUpDistance()
                             )
                         }
                         else {
@@ -420,7 +422,9 @@ Rectangle {
                                 seanceNameField.text,
                                 getExercises(),
                                 warmUpExercise.currentText,
-                                notesArea.text
+                                notesArea.text,
+                                warmUpTime.text,
+                                getWarmUpDistance()
                             )
                         }
                         clearFields()
@@ -445,7 +449,9 @@ Rectangle {
         var hasName = seanceNameField.text.trim() !== ""
         var hasExercises = getExercises().length > 0
         var hasValidWarmUp = warmUpExercise.currentIndex > 0
-        return hasName && hasExercises && hasValidWarmUp
+        var hasTime = warmUpTime.text.trim() !== ""
+        var hasDistance = warmUpDistance.text.trim() !== ""
+        return hasName && hasExercises && hasValidWarmUp && hasTime && hasDistance
     }
 
     function clearFields() {
@@ -453,6 +459,8 @@ Rectangle {
         exercisesModel.clear()
         warmUpExercise.currentIndex = 0
         notesArea.text = ""
+        warmUpTime.text = ""
+        warmUpDistance.text = ""
     }
 
     function show() {
@@ -460,7 +468,7 @@ Rectangle {
         root.visible = true
     }
 
-    function showEdit(seanceId, name, exercises, warmUp, notes) {
+    function showEdit(seanceId, name, exercises, warmUp, notes, warmUpTimeVal, warmUpDistanceVal) {
         editMode = true
         editSeanceId = seanceId
         clearFields()
@@ -468,6 +476,8 @@ Rectangle {
         // Pre-fill fields
         seanceNameField.text = name
         notesArea.text = notes
+        warmUpTime.text = warmUpTimeVal
+        warmUpDistance.text = Number(warmUpDistanceVal).toLocaleString(Qt.locale(), 'f', 2)
 
         // Set warm-up combo box
         var warmUpOptions = ["-------", "Running", "Cycling", "Elliptical ", "Stretching", "Nothing"]
@@ -476,7 +486,7 @@ Rectangle {
 
         // Populate exercises (exercises is now an array of objects)
         exercisesModel.clear()
-        if (Array.isArray(exercises)) {
+        if (exercises && exercises.length > 0) {
             for (var i = 0; i < exercises.length; i++) {
                 exercisesModel.append(exercises[i])
             }
@@ -503,5 +513,12 @@ Rectangle {
             "grip": exercise.grip,
             "notas": exercise.notas || ""
         })
+    }
+
+    function getWarmUpDistance() {
+        if (warmUpDistance.acceptableInput && warmUpDistance.text.length > 0) {
+            return Number.fromLocaleString(Qt.locale(), warmUpDistance.text)
+        }
+        return 0.0
     }
 }
