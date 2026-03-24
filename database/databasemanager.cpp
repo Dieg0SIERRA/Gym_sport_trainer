@@ -214,6 +214,8 @@ bool DatabaseManager::createTables()
             exercise_list TEXT NOT NULL,
             warm_up TEXT NOT NULL,
             notes TEXT,
+            warm_up_time TEXT NOT NULL,
+            warm_up_distance REAL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
@@ -675,7 +677,8 @@ bool DatabaseManager::deleteCalendarNote(int userId, const QString &date)
 
 // ========== Functions for seance actions ==========
 
-bool DatabaseManager::addSeance(int userId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes)
+bool DatabaseManager::addSeance(int userId, const QString &name, const QString &exercisesList, const QString &warmUp,
+                                const QString &notes, const QString &warmUpTime, double warmUpDistance)
 {
     if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
         emit SeanceAdded(false, "The name and list of exercises are mandatory.");
@@ -690,8 +693,8 @@ bool DatabaseManager::addSeance(int userId, const QString &name, const QString &
     // Insert Seance
     QSqlQuery query(m_database);
     query.prepare(R"(
-        INSERT INTO seances (user_id, seance_name, exercise_list, warm_up, notes)
-        VALUES (:user_id, :name, :exercisesList, :warmUp, :notes)
+        INSERT INTO seances (user_id, seance_name, exercise_list, warm_up, notes, warm_up_time, warm_up_distance)
+        VALUES (:user_id, :name, :exercisesList, :warmUp, :notes, :warmUpTime, :warmUpDistance)
     )");
 
     query.bindValue(":user_id", userId);
@@ -699,6 +702,8 @@ bool DatabaseManager::addSeance(int userId, const QString &name, const QString &
     query.bindValue(":exercisesList", exercisesList);
     query.bindValue(":warmUp", warmUp);
     query.bindValue(":notes", notes);
+    query.bindValue(":warmUpTime", warmUpTime);
+    query.bindValue(":warmUpDistance", warmUpDistance);
 
     if (!query.exec()) {
         qWarning() << "Error to add seance:" << query.lastError().text();
@@ -717,7 +722,7 @@ QVariantList DatabaseManager::getSeanceByUser(int userId)
 
     QSqlQuery query(m_database);
     query.prepare(R"(
-        SELECT id, seance_name, exercise_list, warm_up, notes, created_at
+        SELECT id, seance_name, exercise_list, warm_up, notes, warm_up_time, warm_up_distance, created_at
         FROM seances
         WHERE user_id = :user_id
         ORDER BY created_at DESC
@@ -739,7 +744,9 @@ QVariantList DatabaseManager::getSeanceByUser(int userId)
         
         seance["warmup"] = query.value(3).toString();
         seance["notes"] = query.value(4).toString();
-        seance["created_at"] = query.value(5).toString();
+        seance["warmuptime"] = query.value(5).toString();
+        seance["warmupdistance"] = query.value(6).toDouble();
+        seance["created_at"] = query.value(7).toString();
 
         seances.append(seance);
     }
@@ -806,7 +813,8 @@ bool DatabaseManager::deleteSeance(int seanceId)
     return false;
 }
 
-bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QString &exercisesList, const QString &warmUp, const QString &notes)
+bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QString &exercisesList, const QString &warmUp,
+                                   const QString &notes, const QString &warmUpTime, double warmUpDistance)
 {
 
     if (name.trimmed().isEmpty() || exercisesList.trimmed().isEmpty()) {
@@ -823,7 +831,7 @@ bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QStr
     QSqlQuery query(m_database);
     query.prepare(R"(
         UPDATE seances
-        SET seance_name = :name, exercise_list = :exercisesList, warm_up = :warmUp, notes = :notes
+        SET seance_name = :name, exercise_list = :exercisesList, warm_up = :warmUp, notes = :notes, warm_up_time = :warmUpTime, warm_up_distance = :warmUpDistance
         WHERE id = :id
     )");
 
@@ -832,6 +840,8 @@ bool DatabaseManager::updateSeance(int seanceId, const QString &name, const QStr
     query.bindValue(":exercisesList", exercisesList);
     query.bindValue(":warmUp", warmUp);
     query.bindValue(":notes", notes);
+    query.bindValue(":warmUpTime", warmUpTime);
+    query.bindValue(":warmUpDistance", warmUpDistance);
 
     if (!query.exec()) {
         qWarning() << "Error to update seance:" << query.lastError().text();
