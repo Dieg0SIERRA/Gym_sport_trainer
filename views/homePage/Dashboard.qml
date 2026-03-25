@@ -323,7 +323,9 @@ Rectangle {
                             seances[i].name,
                             seances[i].exerciselist,
                             seances[i].warmup,
-                            seances[i].notes
+                            seances[i].notes,
+                            seances[i].warmuptime,
+                            seances[i].warmupdistance
                         )
                         return
                     }
@@ -561,9 +563,9 @@ Rectangle {
             selectExercisePopup.show()
         }
 
-        onSeanceAdded: function(name, exercises, warmUp, notes) {
+        onSeanceAdded: function(name, exercises, warmUp, notes, warmUpTime, warmUpDistance) {
             console.log("Seance added for userId:", root.currentUserId)
-            console.log("data:", name, exercises, warmUp, notes)
+            console.log("data:", name, exercises, warmUp, notes, warmUpTime, warmUpDistance)
 
             if (root.currentUserId <= 0) {
                 console.error("Error: userId not valid:", root.currentUserId)
@@ -574,18 +576,18 @@ Rectangle {
             var exercisesString = exercises.join(",")
 
             DatabaseManager.addSeance(
-                root.currentUserId, name, exercisesString, warmUp, notes )
+                root.currentUserId, name, exercisesString, warmUp, notes, warmUpTime, warmUpDistance)
         }
 
-        onSeanceUpdated: function(seanceId, name, exercises, warmUp, notes) {
+        onSeanceUpdated: function(seanceId, name, exercises, warmUp, notes, warmUpTime, warmUpDistance) {
             console.log("Seance edited, id:", seanceId)
-            console.log("data:", name, exercises, warmUp, notes)
+            console.log("data:", name, exercises, warmUp, notes, warmUpTime, warmUpDistance)
 
             // Convert array of IDs to string "1,5,12"
             var exercisesString = exercises.join(",")
 
             DatabaseManager.updateSeance(
-                seanceId, name, exercisesString, warmUp, notes )
+                seanceId, name, exercisesString, warmUp, notes, warmUpTime, warmUpDistance)
         }
 
         onCancelled: {
