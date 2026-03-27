@@ -488,7 +488,16 @@ Rectangle {
         exercisesModel.clear()
         if (exercises && exercises.length > 0) {
             for (var i = 0; i < exercises.length; i++) {
-                exercisesModel.append(exercises[i])
+                var ex = exercises[i]
+                exercisesModel.append({
+                    "id":           ex.id           || 0,
+                    "nombre":       ex.nombre       || "",
+                    "repeticiones": ex.repeticiones || "",
+                    "series":       ex.series       || 0,
+                    "peso":         ex.peso         || 0,
+                    "grip":         ex.grip         || "",
+                    "notas":        ex.notas        || ""
+                })
             }
         }
 

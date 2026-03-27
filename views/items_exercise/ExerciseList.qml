@@ -583,10 +583,4 @@ Rectangle {
     function refresh() {
         loadExercises()
     }
-    
-    function loadVariations() {
-        console.log("Loading variations for template:", model.id)
-        templateCard.variations = DatabaseManager.getExerciseVariations(model.id)
-        console.log("Loaded variations:", templateCard.variations.length)
-    }
 }
